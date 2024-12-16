@@ -1,3 +1,48 @@
+@uri = http://localhost:8000/api
+
 ### 
-GET http://localhost:8000/
+GET {{ uri }}/posts
 Content-Type: application/json
+
+###
+POST {{ uri }}/posts
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name" : "Post 1",
+    "desc" : "Testing post, testing 1234"
+}
+
+###
+POST {{ uri }}/posts
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name" : "Post 2",
+    "desc" : "Testing post number 2, testing 1234"
+}
+
+###
+get {{ uri }}/posts/2
+Content-Type: application/json
+Accept: application/json
+
+
+###
+PUT {{ uri }}/posts/2
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name" : "PostING 2",
+    "desc" : "Testing post number 2, Then saying testing 1234"
+}
+
+
+###
+DELETE {{ uri }}/posts/2
+Content-Type: application/json
+Accept: application/json
+
