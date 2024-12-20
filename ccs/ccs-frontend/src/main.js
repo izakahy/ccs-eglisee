@@ -1,14 +1,20 @@
 import './assets/main.css'
 
-import { createApp } from 'vue'
+import { createApp, markRaw } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
+const pinia = createPinia();
 
-app.use(createPinia())
+// Add the router globally to all stores
+pinia.use(({ store }) => {
+    store.router = markRaw(router)
+});
+
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')
