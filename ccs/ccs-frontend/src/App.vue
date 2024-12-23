@@ -20,7 +20,7 @@ const toggleSubmenu = (key) => {
 
 <template>
   <header>
-    <nav class="bg-black dark:bg-gray-50 p-7">
+    <nav class="bg-black dark:bg-gray-900 p-7">
         <div class="max-w-screen-xl px-4 py-3 mx-auto text-white">
             <div class="flex items-center">
                 <div>
