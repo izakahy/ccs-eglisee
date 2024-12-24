@@ -3,6 +3,7 @@
 
 <template>
   <main>
+    <!-- hero -->
     <div class="mx-auto bg-gray-200 relative">
       <div class="absolute inset-0 flex justify-center items-center">
         <h1 class="text-center font-bold text-8xl text-white">Welcome</h1>
@@ -16,11 +17,29 @@
       <div class="flex justify-center p-5">
         <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Learn more</button>
       </div>
-      <div>
-        <div class="grid grid-cols-3 gap-11 gap-y-5 mx-auto max-w-4xl">
-          <div class="bg-red-950 p-11 rounded-md">Hi HiHiHiHiHiHiHi</div>
-          <div class="bg-blue-800 p-11 rounded-md">Hello</div>
-          <div class="bg-green-800 p-11 rounded-md">Hey</div>
+      <div class="mt-11 mb-11">
+        <div class="grid grid-cols-3 gap-11 gap-y-5 mx-auto max-w-6xl">
+          <div class="bg-red-950 p-11 rounded-md">
+            <p>
+              Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
+               Non at aliquam cursus feugiat dapibus suspendisse leo risus tempor. Sem scelerisque urna sapien vel venenatis dolor elit ut id.
+               Vulputate vel luctus iaculis pretium sem eget feugiat.
+            </p>
+          </div>
+          <div class="bg-blue-800 p-11 rounded-md">
+            <p>
+              Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
+               Non at aliquam cursus feugiat dapibus suspendisse leo risus tempor. Sem scelerisque urna sapien vel venenatis dolor elit ut id.
+               Vulputate vel luctus iaculis pretium sem eget feugiat.
+            </p>
+          </div>
+          <div class="bg-green-800 p-11 rounded-md">
+            <p>
+              Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
+               Non at aliquam cursus feugiat dapibus suspendisse leo risus tempor. Sem scelerisque urna sapien vel venenatis dolor elit ut id.
+               Vulputate vel luctus iaculis pretium sem eget feugiat.
+            </p>
+          </div>
           <div class="flex justify-center gap-0">
             <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Learn more</button>
           </div>
@@ -46,9 +65,9 @@
     </div>
 
     <div>
-      <div class="bg-gray-500 grid grid-cols-2 gap-3 mx-auto max-w-7xl mt-5 mb-5">
+      <div class="grid grid-cols-2 gap-3 mx-auto max-w-7xl mt-5 mb-5">
         <div class="bg-yellow-500 flex flex-col justify-between">
-          <h1 class="text-7xl font-medium text-start">ABOUT PASTOR</h1>
+          <h1 class="text-7xl font-medium text-start" id="about">ABOUT PASTOR</h1>
 
           <div class="pl-0 p-2">
             <p class="text-lg">
