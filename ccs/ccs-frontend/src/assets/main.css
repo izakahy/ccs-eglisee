@@ -5,3 +5,16 @@
 html {
     @apply scroll-smooth;
 }
+
+.hero-text {
+    @apply text-center font-bold text-7xl sm:text-7xl md:text-8xl lg:text-8xl text-white transition-all duration-500 ease-in-out;
+}
+.h-about-pastor {
+  @apply text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-medium text-center sm:text-center md:text-start lg:text-start transition-all duration-500 ease-in-out;
+}
+.s-highlight {
+    @apply absolute bottom-0 left-0 w-0 h-1 bg-white transition-all duration-300 ease-out group-hover:w-full group-active:bg-purple-500;
+}
+.pop-up-a {
+    @apply transform transition duration-300 ease-in-out group-active:scale-105 group-active:-translate-y-1;
+}
