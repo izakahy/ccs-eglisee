@@ -18,6 +18,10 @@ const toggleSubmenu = (key) => {
   submenuOpen.value[key] = !submenuOpen.value[key]
 }
 
+watch(isMenuOpen, (newValue) => {
+  document.body.style.overflow = newValue ? 'hidden' : 'auto';
+});
+
 </script>
 
 <template>
@@ -26,7 +30,7 @@ const toggleSubmenu = (key) => {
       <div class="max-w-screen-xl mx-auto text-white">
         <div class="flex items-center justify-between">
           <!-- Logo -->
-          <div>
+          <div class="text-center">
             <RouterLink :to="{ name: 'home' }" class="block">
               <img 
                 class="w-16 md:w-20" 
@@ -82,7 +86,7 @@ const toggleSubmenu = (key) => {
             </li>
             <li><RouterLink :to="{ name: 'posts' }">CONNECT</RouterLink></li>
             <li><RouterLink :to="{ name: 'create' }">EVENT</RouterLink></li>
-            <li><RouterLink :to="{ name: 'create' }">WATCH</RouterLink></li>
+            <li><a target="_blank" href="https://www.youtube.com/@CommunauteCompassionShediac">WATCH</a></li>
             <li><RouterLink :to="{ name: 'create' }">FORWARD</RouterLink></li>
             <li><RouterLink :to="{ name: 'create' }">GIVE</RouterLink></li>
           </ul>
@@ -90,18 +94,18 @@ const toggleSubmenu = (key) => {
 
         <!-- Mobile Navigation -->
         <div 
-          class="md:hidden transition-all duration-300 ease-in-out"
-          :class="{'opacity-100 max-h-96': isMenuOpen, 'opacity-0 max-h-0 overflow-hidden': !isMenuOpen}"
+          class="md:hidden fixed top-[88px] z-10 right-0 h-[calc(100vh-88px)] w-full bg-black opacity-90 overflow-y-auto transform transition-transform duration-300 ease-in-out"
+          :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
         >
-          <ul class="flex flex-col space-y-4 pt-4 text-xl">
+          <ul class="flex flex-col font-bold items-center mt-5 lg:mt-0 space-y-4 pt-4 text-3xl">
             <li class="relative">
-              <div class="flex items-center cursor-pointer" @click="toggleSubmenu('home')">
+              <!-- <div class="flex items-center cursor-pointer" @click="toggleSubmenu('home')">
                 <a href="#about">ABOUT</a>
                 <span class="ml-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4 transition-transform duration-200"
-                    :class="{'rotate-180': submenuOpen.home}"
+                    :class="{ 'rotate-180': submenuOpen.home }"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -112,11 +116,11 @@ const toggleSubmenu = (key) => {
                     />
                   </svg>
                 </span>
-              </div>
+              </div> -->
             </li>
             <li><RouterLink :to="{ name: 'posts' }">CONNECT</RouterLink></li>
             <li><RouterLink :to="{ name: 'create' }">EVENT</RouterLink></li>
-            <li><RouterLink :to="{ name: 'create' }">WATCH</RouterLink></li>
+            <li><a href="https://www.youtube.com/@CommunauteCompassionShediac">WATCH</a></li>
             <li><RouterLink :to="{ name: 'create' }">FORWARD</RouterLink></li>
             <li><RouterLink :to="{ name: 'create' }">GIVE</RouterLink></li>
           </ul>
