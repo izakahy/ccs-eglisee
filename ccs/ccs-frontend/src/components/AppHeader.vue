@@ -11,12 +11,19 @@ const submenuOpen = ref({
   forward: false,
   give: false
 });
-const isMenuOpen = ref(false)
+const isMenuOpen = ref(false);
+const aboutItems = [
+  { label: 'Our Story', path: '/about/story' },
+  { label: 'Mission', path: '/about/mission' },
+  { label: 'Team', path: '/about/team' }
+]
 
 // toggale
 const toggleSubmenu = (key) => {
   submenuOpen.value[key] = !submenuOpen.value[key]
 }
+
+
 
 watch(isMenuOpen, (newValue) => {
   document.body.style.overflow = newValue ? 'hidden' : 'auto';
@@ -64,14 +71,18 @@ watch(isMenuOpen, (newValue) => {
 
           <!-- Desktop Navigation -->
           <ul class="hidden md:flex space-x-8 text-2xl">
-            <li class="relative">
-              <div class="flex items-center cursor-pointer" @click="toggleSubmenu('home')">
+            <li 
+              class="relative"
+              @mouseenter="submenuOpen.about = true"
+              @mouseleave="submenuOpen.about = false"  
+            >
+              <div class="flex items-center cursor-pointer">
                 <a href="#about">ABOUT</a>
-                <span class="ml-2">
+                <span class="ml-1">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4 transition-transform duration-200"
-                    :class="{'rotate-180': submenuOpen.home}"
+                    :class="{'rotate-180': submenuOpen.about}"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -83,6 +94,22 @@ watch(isMenuOpen, (newValue) => {
                   </svg>
                 </span>
               </div>
+
+              <!-- Dropdown Menu -->
+              <div v-if="submenuOpen.about" 
+                class="absolute z-10 left-0 -translate-x-2  bg-black divide-y  rounded-lg shadow w-44 dark:bg-gray-700">
+                <div class="absolute w-full h-2 -top-2"></div>
+                <ul class="py-2 text-base text-white font-semibold dark:text-gray-200">
+                    <li v-for="item in aboutItems" :key="item.path">
+                        <RouterLink 
+                            :to="item.path"
+                            class="block px-4 py-2 hover:bg-gray-800"
+                        >
+                            {{ item.label }}
+                        </RouterLink>
+                    </li>
+                </ul>
+            </div>
             </li>
             <li><RouterLink :to="{ name: 'posts' }">CONNECT</RouterLink></li>
             <li><RouterLink :to="{ name: 'create' }">EVENT</RouterLink></li>

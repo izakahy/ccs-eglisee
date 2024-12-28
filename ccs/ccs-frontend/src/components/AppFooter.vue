@@ -1,5 +1,5 @@
 <script setup>
-import { PhoneIcon, EnvelopeIcon, ClockIcon, HomeIcon } from '@heroicons/vue/24/outline'
+import { PhoneIcon, EnvelopeIcon, ClockIcon, UserIcon } from '@heroicons/vue/24/outline'
 </script>
 
 <template>
@@ -20,8 +20,16 @@ import { PhoneIcon, EnvelopeIcon, ClockIcon, HomeIcon } from '@heroicons/vue/24/
         <p>Every Sunday</p>
       </div>
 
-      <div class="flex justify-end space-x-3">
-        <p class="text-end text-sm">&copy; {{ new Date().getFullYear() }} Communauté De La Compassion, Shediac</p>
+      <div class="flex flex-col lg:flex-row md:justify-between lg:justify-between md:items-center lg:items-center text-gray-200 transition-all duration-500 ease-in-out">
+        <div class="flex items-center space-x-2">
+          <UserIcon class="h-5 w-5" />
+          <p class="text-sm truncate">Admin</p>
+        </div>
+        <div class="">
+          <p class="text-start md:text-end lg:text-end text-xs m-0">
+            &copy; {{ new Date().getFullYear() }} Communauté De La Compassion, Shediac
+          </p>
+        </div>
       </div>
     </div>
   </footer>

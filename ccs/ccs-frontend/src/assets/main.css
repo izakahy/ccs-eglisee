@@ -18,3 +18,4 @@ html {
 .pop-up-a {
     @apply transform transition duration-300 ease-in-out group-active:scale-105 group-active:-translate-y-1;
 }
+
