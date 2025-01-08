@@ -31,12 +31,12 @@ Accept: application/json
 
 
 ###
-PUT {{ uri }}/posts/2
+PUT {{ uri }}/posts/3
 Content-Type: application/json
 Accept: application/json
 
 {
-    "name" : "PostING 2",
+    "name" : "",
     "desc" : "Testing post number 2, Then saying testing 1234"
 }
 

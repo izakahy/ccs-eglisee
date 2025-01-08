@@ -12,7 +12,7 @@ onMounted(async () => (posts.value = await getPosts()));
 </script>
 
 <template>
-  <main>
+  <main class="flex-grow">
     <h1 class="title">Posts</h1>
     <div class="text-red-500 tooltip" v-if="message">{{ message.message }}</div>
 

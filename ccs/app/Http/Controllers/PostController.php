@@ -36,8 +36,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        // return ['post' => $post];
-        return $post; //using route model binding
+        return ['post' => $post];
+        //return $post; //using route model binding
     }
 
     /**
