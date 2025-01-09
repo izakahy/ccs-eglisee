@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -9,11 +10,14 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum'); 
 
-// Route::get('auth/google/redirect', function (Request $request) {
-//     return Socialite::driver('google')->redirect();
-// });
-// Route::get('auth/google/callback', function (Request $request) {
-//     dd($request->all());    
-// });
+Route::prefix('auth/google')->middleware('web')->group(function() {
+    Route::get('redirect', [GoogleAuthController::class, 'redirect']);
+    Route::get('callback', [GoogleAuthController::class, 'callback']);
+});
 
-Route::apiResource('posts', PostController::class);
+Route::middleware('auth:sanctum')->group(function() {
+    Route::get('/user', function(Request $request) {
+        return $request->user();
+    });
+    Route::apiResource('posts', PostController::class);
+});

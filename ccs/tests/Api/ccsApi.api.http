@@ -3,6 +3,7 @@
 ### 
 GET {{ uri }}/posts
 Content-Type: application/json
+Accept: application/json
 
 ###
 POST {{ uri }}/posts
@@ -46,3 +47,8 @@ DELETE {{ uri }}/posts/2
 Content-Type: application/json
 Accept: application/json
 
+
+### Test posts endpoint
+GET {{ uri }}/posts
+Authorization: Bearer 3|HEIBoVMfrhecmRArhUGuIhQeRtM9y0JEKhcsQlVvf4668f09
+Accept: application/json
