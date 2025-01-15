@@ -10,9 +10,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum'); 
 
-Route::prefix('auth/google')->middleware('web')->group(function() {
-    Route::get('redirect', [GoogleAuthController::class, 'redirect']);
-    Route::get('callback', [GoogleAuthController::class, 'callback']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('auth/google/logout', [GoogleAuthController::class, 'logout']);
 });
 
 Route::middleware('auth:sanctum')->group(function() {

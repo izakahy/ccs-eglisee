@@ -4,6 +4,8 @@ import PostView from '@/views/Post/PostView.vue'
 import CreateView from '@/views/Post/CreateView.vue'
 import ShowView from '@/views/Post/ShowView.vue'
 import UpdateView from '@/views/Post/UpdateView.vue'
+import AuthView from '@/views/AuthView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,6 +14,11 @@ const router = createRouter({
       path: '/', // defines a route
       name: 'home',
       component: HomeView,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: AuthView,
     },
     {
       path: '/posts',

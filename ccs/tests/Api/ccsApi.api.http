@@ -1,4 +1,5 @@
 @uri = http://localhost:8000/api
+@logoutUri = http://localhost:8000/auth/google
 
 ### 
 GET {{ uri }}/posts
@@ -50,5 +51,11 @@ Accept: application/json
 
 ### Test posts endpoint
 GET {{ uri }}/posts
+Authorization: Bearer 3|HEIBoVMfrhecmRArhUGuIhQeRtM9y0JEKhcsQlVvf4668f09
+Accept: application/json
+
+
+### Test logout endpoint
+POST {{ uri }}/auth/google/logout 
 Authorization: Bearer 3|HEIBoVMfrhecmRArhUGuIhQeRtM9y0JEKhcsQlVvf4668f09
 Accept: application/json
