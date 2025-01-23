@@ -5,6 +5,7 @@ import CreateView from '@/views/Post/CreateView.vue'
 import ShowView from '@/views/Post/ShowView.vue'
 import UpdateView from '@/views/Post/UpdateView.vue'
 import AuthView from '@/views/AuthView.vue'
+import Callback from '@/components/Callback.vue'
 
 
 const router = createRouter({
@@ -19,6 +20,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: AuthView,
+    },
+    {
+      path: '/auth/callback',
+      name: 'callback',
+      component: Callback,
     },
     {
       path: '/posts',

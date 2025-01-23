@@ -1,6 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { RouterLink, RouterView } from 'vue-router'
+import { useAuthStore } from '@/stores/Auth';
+
+const authStore = useAuthStore();
 
 // Track which submenu is open
 const submenuOpen = ref({
@@ -11,6 +14,7 @@ const submenuOpen = ref({
   forward: false,
   give: false
 });
+
 const isMenuOpen = ref(false);
 const aboutItems = [
   { label: 'Our Story', path: '/about/story' },
@@ -23,7 +27,13 @@ const toggleSubmenu = (key) => {
   submenuOpen.value[key] = !submenuOpen.value[key]
 }
 
+// Logout function
+const handleLogout = async () => {
+    await authStore.logout(); // Call the logout action from the auth store
+};
 
+// Computed property to reactivly update the ui based on the return value
+const isAuthenticated = computed(() => authStore.checkAuth());
 
 watch(isMenuOpen, (newValue) => {
   document.body.style.overflow = newValue ? 'hidden' : 'auto';
@@ -45,6 +55,31 @@ watch(isMenuOpen, (newValue) => {
                 alt="church-logo"
               >
             </RouterLink>
+          </div>
+
+           <!-- User Info and Logout -->
+          <div class="flex items-center space-x-4">
+              <span
+              v-if="isAuthenticated"
+              class="text-sm text-orange-100">
+                 Welcome {{ authStore.user.name }}
+              </span> 
+              <a 
+                  type="button" 
+                  v-if="isAuthenticated" 
+                  @click="handleLogout"
+                  class="text-lg cursor-pointer hover:font-extrabold hover:text-red-500 text-white"
+                  :disabled="authStore.isLoading"
+                >
+                  <span v-if="!authStore.isLoading">Logout</span>
+                  <span v-else class="flex items-center">
+                    <svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Logging out...
+                  </span>
+                </a>
           </div>
 
           <!-- Hamburger Menu Button -->

@@ -1,4 +1,7 @@
 <script setup>
+import YoutubePlayer from '@/components/YoutubePlayer.vue';
+
+
 </script>
 
 <template>
@@ -73,16 +76,7 @@
       </div>
     </div>
 
-    <div class="bg-black flex flex-col justify-center items-center relative pb-11">
-      <h3 class="text-white text-center font-normal text-4xl mb-4">LATEST SERMONS</h3>
-      <iframe 
-        class="w-full max-w-7xl h-[500px]"
-        src="https://www.youtube.com/embed/YA2Lxfw4SSw?autoplay=1&mute=1&loop=1" 
-        frameborder="0"
-        allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </div>
+    <YoutubePlayer></YoutubePlayer>
 
     <div>
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 mx-auto max-w-7xl mt-5 mb-5">

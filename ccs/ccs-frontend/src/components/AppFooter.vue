@@ -1,6 +1,13 @@
 <script setup>
 import { PhoneIcon, EnvelopeIcon, ClockIcon, UserIcon } from '@heroicons/vue/24/outline'
 import { RouterLink } from 'vue-router';
+import { useAuthStore } from '@/stores/Auth';
+
+const authStore = useAuthStore();
+
+const handleLogin = () => {
+  authStore.googleLogin();
+}
 </script>
 
 <template>
@@ -24,10 +31,10 @@ import { RouterLink } from 'vue-router';
       <div class="flex flex-col lg:flex-row md:justify-between lg:justify-between md:items-center lg:items-center text-gray-200 transition-all duration-500 ease-in-out">
         <div class="flex items-center space-x-2">
           <UserIcon class="h-5 w-5" />
-          <a class="text-gray-400 hover:text-white active:text-yellow-300 active:font-bold transition duration-300">
-            <RouterLink :to="'/login'" >
+          <a
+          type="button" @click="handleLogin"
+          class="text-gray-400 hover:text-white cursor-pointer active:text-yellow-300 active:font-bold transition duration-300">
               <p class="text-sm truncate">Admin</p>
-            </RouterLink>
           </a>  
         </div>
         <div class="">
