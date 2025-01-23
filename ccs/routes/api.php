@@ -4,19 +4,27 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Socialite\Facades\Socialite;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum'); 
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('auth/google/logout', [GoogleAuthController::class, 'logout']);
+// Authentication routes
+Route::prefix('auth')->group(function () {
+    Route::get('google/redirect', [GoogleAuthController::class, 'redirect']);
+    Route::get('google/callback', [GoogleAuthController::class, 'callback']);
+    Route::post('google/logout', [GoogleAuthController::class, 'logout'])
+        ->middleware('auth:sanctum');
 });
 
-Route::middleware('auth:sanctum')->group(function() {
-    Route::get('/user', function(Request $request) {
-        return $request->user();
+
+// User routes
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/user', function (Request $request) {
+        return response()->json([
+            'token' => $request->session()->get('token'),
+            'user' => $request->user(),
+        ]);
     });
+
+    // Posts resource routes
     Route::apiResource('posts', PostController::class);
 });

@@ -12,13 +12,20 @@ use App\Models\User;
 class GoogleAuthController extends Controller
 {
     public function redirect() {
-        return Socialite::driver('google')->redirect();
+        $url = Socialite::driver('google')
+        ->stateless()
+        ->redirect();
+        
+        return $url;
     }
 
     public function callback(Request $request)
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            $googleUser = Socialite::driver('google')
+                    ->stateless()
+                    ->user();
+
             $email = $googleUser->getEmail();
 
             if (!$this->isEmailAllowed($email)) {
@@ -34,19 +41,20 @@ class GoogleAuthController extends Controller
                 [
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
-                    'password' => bcrypt(Str::random(16)),
+                    'password' => bcrypt(Str::random(16)), // Random password for the user
                 ]
             );
 
             // Create token
             $token = $user->createToken('google-token')->plainTextToken;
 
-            return response()->json([
+             // Redirect to frontend with token and user data
+            $frontendCallbackUrl = config('services.frontend.callback_url') . '?' . http_build_query([
                 'token' => $token,
-                'user' => $user,
-                'message' => "Successfully logged in with Google!"
+                'user' => json_encode($user->only(['id', 'name', 'email'])),
             ]);
 
+            return redirect($frontendCallbackUrl);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',

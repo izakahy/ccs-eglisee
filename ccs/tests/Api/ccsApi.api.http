@@ -51,11 +51,11 @@ Accept: application/json
 
 ### Test posts endpoint
 GET {{ uri }}/posts
-Authorization: Bearer 3|HEIBoVMfrhecmRArhUGuIhQeRtM9y0JEKhcsQlVvf4668f09
+Authorization: Bearer 42|ahN52jEdp71mFehY6gJYqFwlGt6RBm1z0OLPsye357c42d97
 Accept: application/json
 
 
 ### Test logout endpoint
 POST {{ uri }}/auth/google/logout 
-Authorization: Bearer 3|HEIBoVMfrhecmRArhUGuIhQeRtM9y0JEKhcsQlVvf4668f09
+Authorization: Bearer 77|VGUQjJHcohtFqyCiRaPQiSIR7tGGRc593ufn03Vs796cc01f
 Accept: application/json
