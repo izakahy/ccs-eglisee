@@ -1,4 +1,5 @@
 <script setup>
+import HeroCard from '@/components/InfoCards/HeroCard.vue';
 import YoutubePlayer from '@/components/YoutubePlayer.vue';
 
 
@@ -22,56 +23,16 @@ import YoutubePlayer from '@/components/YoutubePlayer.vue';
     <div class="p-5">
       <h2 class="text-center text-4xl lg:text-7xl lg:mt-3.5">SERVICE TIMES</h2>
       <p class="text-bold text-center P-2">58 FESTIVAL STREET, SHEDIAC, NB E4P IS4</p>
+      
       <div class="flex justify-center p-5">
         <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Learn more</button>
       </div>
+      
       <div class="mt-11 mb-11">
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-11 gap-y-5 mx-auto max-w-6xl">
-          
-          <!-- First card -->
-          <div>
-            <div class="bg-red-950 pt-2 p-11 rounded-md">
-              <h1 class="font-bold text-3xl mb-4">Title</h1>
-              <p>
-                Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
-                Non at aliquam cursus feugiat dapibus suspendisse leo risus tempor. Sem scelerisque urna sapien vel venenatis dolor elit ut id.
-                Vulputate vel luctus iaculis pretium sem eget feugiat.
-              </p>
-            </div>
-            <div class="flex justify-center mt-4">
-              <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Learn more</button>
-            </div>
-          </div>
-
-          <!-- Second card -->
-          <div>
-            <div class="bg-blue-800 pt-2 p-11 rounded-md">
-              <h1 class="font-bold text-3xl mb-4">Title</h1>
-              <p>
-                Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
-                Non at aliquam cursus feugiat dapibus suspendisse leo risus tempor. Sem scelerisque urna sapien vel venenatis dolor elit ut id.
-                Vulputate vel luctus iaculis pretium sem eget feugiat.
-              </p>
-            </div>
-            <div class="flex justify-center mt-4">
-              <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Learn more</button>
-            </div>
-          </div>
-
-          <!-- Third card -->
-          <div>
-            <div class="bg-green-800 pt-2 p-11 rounded-md">
-              <h1 class="font-bold text-3xl mb-4">Title</h1>
-              <p>
-                Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
-                Non at aliquam cursus feugiat dapibus suspendisse leo risus tempor. Sem scelerisque urna sapien vel venenatis dolor elit ut id.
-                Vulputate vel luctus iaculis pretium sem eget feugiat.
-              </p>
-            </div>
-            <div class="flex justify-center mt-4">
-              <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Learn more</button>
-            </div>
-          </div>
+          <HeroCard bgColor="bg-red-800" title="Title 1"></HeroCard>
+          <HeroCard bgColor="bg-blue-500" title="Title 2"></HeroCard>
+          <HeroCard bgColor="bg-green-500" title="Title 3"></HeroCard>
         </div>
       </div>
     </div>
