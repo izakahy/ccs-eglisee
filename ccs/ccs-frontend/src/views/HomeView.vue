@@ -37,7 +37,7 @@ import YoutubePlayer from '@/components/YoutubePlayer.vue';
       </div>
     </div>
 
-    <YoutubePlayer></YoutubePlayer>
+    <YoutubePlayer />
 
     <div>
       <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 mx-auto max-w-7xl mt-5 mb-5">

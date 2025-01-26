@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, computed, nextTick , watch } from 'vue';
+    import { ref, computed, watch } from 'vue';
     import { PencilSquareIcon } from '@heroicons/vue/24/outline';
     import { useAuthStore } from '@/stores/Auth';
     import EditorDialog from '../Helper/EditorDialog.vue';
