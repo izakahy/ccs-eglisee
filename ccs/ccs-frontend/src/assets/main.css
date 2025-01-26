@@ -2,6 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .editor-content h1 {
+    @apply text-3xl font-bold;
+  }
+  .editor-content h2 {
+    @apply text-2xl font-bold;
+  }
+  .editor-content h3 {
+    @apply text-xl font-bold;
+  }
+  
+  /* For the display area */
+  .prose-preview h1 {
+    @apply text-3xl font-bold;
+  }
+  .prose-preview h2 {
+    @apply text-2xl font-bold;
+  }
+  .prose-preview h3 {
+    @apply text-xl font-bold;
+  }
+
+
+  /* List styles for editor content */
+  .editor-content ul,
+  .editor-content ol {
+    @apply pl-8 my-4;
+  }
+
+  .editor-content ul {
+    @apply list-disc;
+  }
+
+  .editor-content ol {
+    @apply list-decimal;
+  }
+
+  .editor-content li {
+    @apply mb-2;
+  }
+
+  /* Optional: Add styles for nested lists */
+  .editor-content ul ul,
+  .editor-content ol ul {
+    list-style-type: circle;
+  }
+
+  .editor-content ol ol,
+  .editor-content ul ol {
+    list-style-type: lower-roman;
+  }
+}
+
+
 html {
     @apply scroll-smooth;
 }
@@ -18,3 +72,5 @@ html {
 .pop-up-a {
     @apply transform transition duration-300 ease-in-out group-active:scale-105 group-active:-translate-y-1;
 }
+
+

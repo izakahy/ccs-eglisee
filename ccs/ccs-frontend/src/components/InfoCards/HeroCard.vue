@@ -1,16 +1,17 @@
 <script setup>
-    import { ref, computed } from 'vue';
+    import { ref, computed, nextTick , watch } from 'vue';
     import { PencilSquareIcon } from '@heroicons/vue/24/outline';
     import { useAuthStore } from '@/stores/Auth';
+    import EditorDialog from '../Helper/EditorDialog.vue';
+    
 
     const authStore = useAuthStore();
     const emit = defineEmits(['update:title', 'update:body']);
-
+    
     const isAuthenticated = computed(() => authStore.checkAuth());
     const showDialog = ref(false);
     const editType = ref('');
-    const editedText = ref('');
-
+    
     const props = defineProps({
         bgColor: {
             type: String,
@@ -30,54 +31,49 @@
         },
     });
 
-
     const openEdit = (type) => {
         editType.value = type;
-        editedText.value = props[type];
         showDialog.value = true; 
     }
 
-    const saveEdit = () => {
-        if (editType.value === 'title') {
-            emit('update:title', editedText.value);
-        } else {
-            emit('update:body', editedText.value);
-        };
-        showDialog.value = false;
-    }
-    const cancelEdit = () => {
-        showDialog.value = false;
-    }
+    watch(showDialog, (newVal) => {
+        if (!newVal) {
+           setTimeout(() => {
+             editType.value = ''
+           }, 100)
+        }
+    })
 </script>
 
 <template>
     <div>
         <div :class="[bgColor, 'pt-2 p-11 rounded-md']">
-            <h1 class="font-bold text-3xl mb-4">{{ title }}
+            <h1 class="font-bold text-3xl mb-4 relative">
+                {{ title }}
                 <button
                     v-if="isAuthenticated"
                     @click="openEdit('title')"
-                    class="text-white hover:text-yellow-300 active:font-bold rounded-full p-1"
-                    
+                    class="absolute top-0 right-0 text-white hover:text-yellow-300 active:font-bold rounded-full p-1"
                     aria-label="Edit title"
                     title="Edit title"
                 >
                     <PencilSquareIcon class="h-6 w-6" />
                 </button>
             </h1>
-            <p>
-                {{ body }}
+            
+            <div class="relative">
+                <div v-html="body" class="prose prose-preview">
+                </div>
                 <button
                     v-if="isAuthenticated"
                     @click="openEdit('body')"
-                    class="text-white hover:text-yellow-300 active:font-bold rounded-full p-1"
-                    
+                    class="absolute bottom-0 right-0 mt-2 text-white hover:text-yellow-300 active:font-bold rounded-full p-1"
                     aria-label="Edit body"
                     title="Edit body"
                 >
                     <PencilSquareIcon class="h-6 w-6" />
                 </button>
-            </p>
+            </div>
         </div>
         <div class="flex justify-center mt-4">
             <button
@@ -86,39 +82,13 @@
             Learn more
             </button>
         </div>
-       
-        
-        <div v-if="showDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-               <div class="bg-white rounded-lg p-6 w-full max-w-md">
-                   <h3 class="text-lg font-medium mb-4">Edit {{ editType }}</h3>
-                   
-                   <input
-                       v-if="editType === 'title'"
-                       v-model="editedText"
-                       type="text"
-                       class="w-full p-2 border rounded mb-4"
-                   />
-                   <textarea
-                       v-else
-                       v-model="editedText"
-                       class="w-full p-2 border rounded mb-4 h-32"
-                   ></textarea>
-    
-                   <div class="flex justify-end gap-2">
-                       <button
-                           @click="cancelEdit"
-                           class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-                       >
-                           Cancel
-                       </button>
-                       <button
-                           @click="saveEdit"
-                           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                       >
-                           Save
-                       </button>
-                   </div>
-               </div>
-           </div>
+        <EditorDialog
+            v-model="showDialog"
+            :edit-type="editType"
+            :title-value="title"
+            :body-value="body"
+            @update:title="emit('update:title', $event)"
+            @update:body="emit('update:body', $event)"
+        />     
     </div>
 </template>
