@@ -61,7 +61,7 @@ html {
 }
 
 .hero-text {
-    @apply text-center font-bold text-6xl sm:text-7xl md:text-8xl lg:text-8xl text-white transition-all duration-500 ease-in-out;
+    @apply text-center font-extrabold text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-white transition-all duration-500 ease-in-out;
 }
 .h-about-pastor {
     @apply text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-medium text-center sm:text-center md:text-start lg:text-start transition-all duration-500 ease-in-out;
@@ -70,7 +70,17 @@ html {
     @apply absolute bottom-0 left-0 w-0 h-1 bg-white transition-all duration-300 ease-out group-hover:w-full group-active:bg-purple-500;
 }
 .pop-up-a {
-    @apply transform transition duration-300 ease-in-out group-active:scale-105 group-active:-translate-y-1;
+    @apply transform transition duration-300 hover:scale-105 group-active:scale-105 group-active:-translate-y-1 ease-in-out ;
 }
 
+.btn-primary {
+  @apply text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium text-lg px-5 py-4 me-2 w-5/12 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700;
+}
 
+.btn-secondary {
+  @apply bg-gray-800 text-white text-lg px-8 py-3 rounded-full shadow-lg hover:bg-gray-900 hover:shadow-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-500
+}
+
+.text-shadow {
+  text-shadow: -1px 12px 14px rgb(13 7 7 / 90%);
+}
