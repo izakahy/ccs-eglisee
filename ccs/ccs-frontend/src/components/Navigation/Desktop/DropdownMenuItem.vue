@@ -1,8 +1,8 @@
 <template>
     <li 
       class="relative"
-      @mouseenter="$emit('update:isOpen', true)"
-      @mouseleave="$emit('update:isOpen', false)"
+      @mouseenter="openDropdown"
+      @mouseleave="handleMouseLeave"
     >
       <div class="flex items-center cursor-pointer">
         <a :href="href">{{ label }}</a>
@@ -25,26 +25,44 @@
   
       <!-- Dropdown Menu -->
       <div 
-        v-if="isOpen"
-        class="absolute z-10 left-0 -translate-x-2 bg-black divide-y rounded-lg shadow w-44 dark:bg-gray-700"
-      >
-        <div class="absolute w-full h-2 -top-2"></div>
-        <ul class="py-2 text-base text-white font-semibold dark:text-gray-200">
-          <li v-for="item in items" :key="item.path">
+      v-show="isOpen"
+      class="absolute z-10 left-0 mt-2 -translate-x-2 bg-black rounded-lg shadow-lg min-w-[240px]"
+      @mouseenter="isHoveringDropdown = true"
+      @mouseleave="isHoveringDropdown = false"
+    >
+      <div class="p-2">
+        <!-- Regular Items -->
+        <ul class="space-y-1">
+          <li 
+           v-for="item in items"
+           :key="item.path"
+           @mouseenter="handleItemHover"
+          >
             <RouterLink 
-              :to="item.path"
-              class="block px-4 py-2 hover:bg-gray-800"
+              :to="{ name: 'about', params: { page: extractPageParam(item.path) }}"
+              :class="[
+                'block px-4 py-2 text-white hover:bg-gray-800 rounded-md',
+                { 'bg-gray-900': isActive(item.path) }
+              ]"
+              @click="$emit('update:isOpen', false)"
             >
               {{ item.label }}
             </RouterLink>
           </li>
         </ul>
+
+        <!-- Slot for Admin Controls -->
+        <slot />
       </div>
+    </div>
     </li>
   </template>
   
   <script setup>
-  import { RouterLink } from 'vue-router'
+  import { ref } from 'vue'
+  import { RouterLink, useRoute } from 'vue-router'
+
+  const route = useRoute()
   
   defineProps({
     label: {
@@ -53,7 +71,7 @@
     },
     href: {
       type: String,
-      required: true
+      
     },
     isOpen: {
       type: Boolean,
@@ -61,9 +79,39 @@
     },
     items: {
       type: Array,
-      required: true
+     
     }
   })
+
+  const extractPageParam = (path) => {
+    return path.split('/').pop()
+  }
+
+  const isActive = (path) => `/about/${route.params.page}` === path;
   
-  defineEmits(['update:isOpen'])
+  const emit = defineEmits(['update:isOpen'])
+  const closeTimeout = ref(null)
+  const isHoveringDropdown = ref(false)
+
+
+  const openDropdown = () => {
+    if (closeTimeout.value) {
+      clearTimeout(closeTimeout.value)
+    }
+    emit('update:isOpen', true)
+  }
+
+  const handleMouseLeave = () => {
+    closeTimeout.value = setTimeout(() => {
+      if (!isHoveringDropdown.value) {
+        emit('update:isOpen', false)
+      }
+    }, 100)
+  }
+
+  const handleItemHover = () => {
+    if (closeTimeout.value) {
+      clearTimeout(closeTimeout.value)
+    }
+  }
   </script>

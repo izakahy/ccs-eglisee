@@ -84,3 +84,7 @@ html {
 .text-shadow {
   text-shadow: -1px 12px 14px rgb(13 7 7 / 90%);
 }
+
+#about {
+  @apply scroll-smooth
+}

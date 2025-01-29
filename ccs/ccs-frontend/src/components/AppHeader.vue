@@ -6,8 +6,10 @@ import Logout from './Navigation/Auth/Logout.vue';
 import Mobile from './Navigation/Mobile/Mobile.vue';
 import Hamburger from './Navigation/Mobile/MobileHeader.vue';
 import Desktop from './Navigation/Desktop/DesktopNavigation.vue';
+import { useAboutStore } from '@/stores/NavItems/About';
 
 const authStore = useAuthStore();
+const aboutStore = useAboutStore();
 
 // Track which submenu is open
 const submenuOpen = ref({
@@ -19,20 +21,20 @@ const submenuOpen = ref({
   give: false
 });
 
-const isMenuOpen = ref(false);
-const aboutItems = [
-  { label: 'Our Story', path: '/about/story' },
-  { label: 'Mission', path: '/about/mission' },
-  { label: 'Team', path: '/about/team' }
-]
 
+const isMenuOpen = ref(false);
+const aboutItems = computed(() => 
+  aboutStore.items.map(item => ({
+    ...item,
+    href: item.path
+  }))
+)
 
 // Logout function
 const handleLogout = async () => {
-    await authStore.logout(); // Call the logout action from the auth store
+    await authStore.logout(); 
 };
 
-// Computed property to reactivly update the ui based on the return value
 const isAuthenticated = computed(() => authStore.checkAuth());
 
 watch(isMenuOpen, (newValue) => {
@@ -68,6 +70,7 @@ watch(isMenuOpen, (newValue) => {
             :is-open="isMenuOpen"
             @toggle="isMenuOpen = !isMenuOpen"
           />
+
 
           <!-- Desktop Navigation -->
           <Desktop

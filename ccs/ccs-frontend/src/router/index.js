@@ -6,6 +6,7 @@ import ShowView from '@/views/Post/ShowView.vue'
 import UpdateView from '@/views/Post/UpdateView.vue'
 import AuthView from '@/views/AuthView.vue'
 import Callback from '@/components/Callback.vue'
+import About from '@/components/Navigation/Pages/About.vue'
 
 
 const router = createRouter({
@@ -45,6 +46,12 @@ const router = createRouter({
       path: '/post/update/:id',
       name: 'update',
       component: UpdateView,
+    },
+    {
+      path: '/about/:page',
+      name: 'about',
+      component: About,
+      props: true
     }
   ],
 })

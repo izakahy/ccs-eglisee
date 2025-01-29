@@ -2,12 +2,12 @@
     <div :class="containerClass">
       <!-- Type 1: Simple Content Card -->
       <div v-if="type === 'content'" class="flex flex-col justify-evenly ps-3 min-h-[300px] md:min-h-[380px] lg:min-h-[510px]">
-        <h1 class="h-about-pastor" :class="titleClass">{{ title }}</h1>
+        <h1  id="about"  class="h-about-pastor" :class="titleClass">{{ title }}</h1>
         
         <div class="pl-0 p-2">
           <slot></slot>
         </div>
-  
+        
         <div v-if="showButton" class="text-center lg:text-start transition duration-500 ease-in-out">
           <button class="btn-primary">
             {{ buttonText }}
