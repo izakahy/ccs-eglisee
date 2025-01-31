@@ -7,6 +7,8 @@ import UpdateView from '@/views/Post/UpdateView.vue'
 import AuthView from '@/views/AuthView.vue'
 import Callback from '@/components/Callback.vue'
 import About from '@/components/Navigation/Pages/About.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
+import { useNavigationStore } from '@/stores/NavItems/Navigation'
 
 
 const router = createRouter({
@@ -52,8 +54,35 @@ const router = createRouter({
       name: 'about',
       component: About,
       props: true
-    }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: NotFoundView
+    },
   ],
 })
+
+export function addDynamicRoutes() {
+  const navigationStore = useNavigationStore();
+ 
+  // Remove existing dynamic routes
+  router.getRoutes().forEach(route => {
+    if (route.meta?.isDynamic) {
+      router.removeRoute(route.name); // Remove by route name
+    }
+  });
+
+  // Add dynamic routes to the router
+  const dynamicRoutes = navigationStore.getRouteConfig;
+  dynamicRoutes.forEach(route => {
+    router.addRoute(route);
+  });
+}
+
+router.onError((error) => {
+  console.error('Navigation Error:', error);
+  router.push({ name: 'notFound' });
+});
 
 export default router

@@ -5,7 +5,7 @@ import { createPinia } from 'pinia'
 import { useAuthStore } from './stores/Auth'
 
 import App from './App.vue'
-import router from './router'
+import router, { addDynamicRoutes } from './router'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -17,6 +17,9 @@ pinia.use(({ store }) => {
 });
 
 app.use(pinia)
+
+addDynamicRoutes()
+
 app.use(router)
 
 const authStore = useAuthStore()

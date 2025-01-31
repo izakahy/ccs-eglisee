@@ -3,9 +3,15 @@
       class="relative"
       @mouseenter="openDropdown"
       @mouseleave="handleMouseLeave"
+      :class="{ 'dropdown-active': isParentActive }"
     >
       <div class="flex items-center cursor-pointer">
-        <a :href="href">{{ label }}</a>
+        <RouterLink 
+          :to="href"
+          :class="{ 'text-gray-300 font-semibold': isParentActive }"
+        >
+            {{ label }}
+        </RouterLink>
         <span class="ml-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -26,7 +32,7 @@
       <!-- Dropdown Menu -->
       <div 
       v-show="isOpen"
-      class="absolute z-10 left-0 mt-2 -translate-x-2 bg-black rounded-lg shadow-lg min-w-[240px]"
+      class="absolute z-10 left-0 mt-2 -translate-x-2 bg-black rounded-lg shadow-lg min-w-[240px] transition-all ease-in-out"
       @mouseenter="isHoveringDropdown = true"
       @mouseleave="isHoveringDropdown = false"
     >
@@ -39,7 +45,7 @@
            @mouseenter="handleItemHover"
           >
             <RouterLink 
-              :to="{ name: 'about', params: { page: extractPageParam(item.path) }}"
+              :to="item.path"
               :class="[
                 'block px-4 py-2 text-white hover:bg-gray-800 rounded-md',
                 { 'bg-gray-900': isActive(item.path) }
@@ -59,12 +65,12 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
+  import { ref, computed } from 'vue'
   import { RouterLink, useRoute } from 'vue-router'
 
   const route = useRoute()
   
-  defineProps({
+  const props = defineProps({
     label: {
       type: String,
       required: true
@@ -79,15 +85,27 @@
     },
     items: {
       type: Array,
-     
+      default: () => []
+    },
+    sectionKey: {
+      type: String,
+      required: true
     }
   })
 
-  const extractPageParam = (path) => {
-    return path.split('/').pop()
-  }
+  const currentSection = computed(() => {
+    return route.path.split('/')[1] // Extract section from URL (/about/team -> 'about')
+  })
 
-  const isActive = (path) => `/about/${route.params.page}` === path;
+  const isParentActive = computed(() => {
+    return route.path.startsWith(props.href)
+  })
+
+
+  const isActive = (path) => {
+    // Match exact path or nested paths
+    return route.path === path || route.path.startsWith(`${path}/`)
+  }
   
   const emit = defineEmits(['update:isOpen'])
   const closeTimeout = ref(null)
@@ -106,7 +124,7 @@
       if (!isHoveringDropdown.value) {
         emit('update:isOpen', false)
       }
-    }, 100)
+    }, 50)
   }
 
   const handleItemHover = () => {
