@@ -11,8 +11,64 @@
       @update:is-open="(value) => HandleDropdownToggle(key, value)"
     >
       <!-- Admin Controls (outside regular items) -->
-      <div v-if="isAuthenticated" class="p-6 space-y-4 border-t border-gray-400 mt-4 w-full max-w-2xl mx-auto rounded-xl shadow-md">
-        <!-- Add/Edit Form -->
+      <div v-if="isAuthenticated" class="px-6 pt-1 pb-6 space-y-4 border-t bg-gradient-to-r from-gray-900 to-stone-900 border-gray-400 mt-4 w-full max-w-2xl mx-auto rounded-xl shadow-md">
+        <!-- Section Edit Header -->
+        <div class="mb-4">
+          <p class="text-sm text-gray-300 font-semibold text-center">Edit Section</p>
+        </div>
+
+        <!-- Section Content -->
+        <div class="flex items-center justify-between gap-2 mb-4 border-b border-gray-400 pb-4">
+          
+          <div class="flex-1">
+            <input
+              v-if="editingSectionKey === key"
+              v-model="editingSectionLabel"
+              :placeholder="section.label"
+              class="px-2 py-2 bg-gray-50 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            >
+            <span v-else class="text-white text-xl">{{ section.label }}</span>
+          </div>
+
+          <div class="flex gap-2">
+            <button
+              v-if="editingSectionKey === key"
+              @click="handleUpdateSection(key)"
+              class="p-2 text-white bg-green-500 hover:bg-green-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              title="Save Section"
+            >
+              <PencilSquareIcon class="w-5 h-5" />
+            </button>
+            <button
+              v-if="editingSectionKey === key"
+              @click="cancelSectionEdit"
+              class="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              title="Cancel"
+            >
+              <XMarkIcon class="w-5 h-5" />
+            </button>
+            <button
+              v-else
+              @click="startSectionEdit(key, section.label)"
+              class="p-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              title="Edit Section"
+            >
+              <PencilIcon class="w-5 h-5" />
+            </button>
+            <button
+              @click="handleDeleteSection(key)"
+              class="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              title="Delete Section"
+            >
+              <TrashIcon class="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+        
+        <div class="">
+          <p class="text-sm text-gray-300 font-semibold text-center">Add/Edit Form</p>
+        </div>
+      
         <div class="flex gap-2">
           <input
             v-model="newItem.label"
@@ -56,36 +112,36 @@
     <li><RouterLink :to="{ name: 'create' }">FORWARD</RouterLink></li>
     <li><RouterLink :to="{ name: 'create' }">GIVE</RouterLink></li>
   
-     <!-- Add Section Form -->
-      <div v-if="isAuthenticated" class="items-center">
-        <div v-if="isAddingSectionMode" class="flex gap-2 items-center">
-          <input
-            v-model="newSection.label"
-            placeholder="Section Label (e.g. 'SERVICES')"
-            class="px-2 py-2 bg-gray-50 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-          >
-          <button
-            @click="handleAddSection"
-            class="p-2 text-white bg-green-500 hover:bg-green-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-          >
-            <PencilSquareIcon class="w-5 h-5" />
-          </button>
-          <button
-            @click="isAddingSectionMode = false"
-            class="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-          >
-            <XMarkIcon class="w-5 h-5" />
-          </button>
-        </div>
-        <button
-          v-else
-          @click="isAddingSectionMode = true"
-          class="p-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          title="Add Section"
-        >
-          <PlusIcon class="w-5 h-5" />
-        </button>
-    </div>
+    <!-- Add Section Form -->
+     <div v-if="isAuthenticated" class="items-center">
+       <div v-if="isAddingSectionMode" class="flex gap-2 items-center">
+         <input
+           v-model="newSection.label"
+           placeholder="Section Label (e.g. 'SERVICES')"
+           class="px-2 py-2 bg-gray-50 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+         >
+         <button
+           @click="handleAddSection"
+           class="p-2 text-white bg-green-500 hover:bg-green-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+         >
+           <PencilSquareIcon class="w-5 h-5" />
+         </button>
+         <button
+           @click="isAddingSectionMode = false"
+           class="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+         >
+           <XMarkIcon class="w-5 h-5" />
+         </button>
+       </div>
+       <button
+         v-else
+         @click="isAddingSectionMode = true"
+         class="p-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+         title="Add Section"
+       >
+         <PlusIcon class="w-5 h-5" />
+       </button>
+   </div>
   </ul>
 </template>
   
@@ -93,7 +149,6 @@
   import { ref, computed, reactive, shallowRef } from 'vue';
   import { RouterLink } from 'vue-router'
   import DropdownMenuItem from './DropdownMenuItem.vue';
-  import { useAboutStore } from '@/stores/NavItems/About';
   import { useAuthStore } from '@/stores/Auth';
   import { PencilSquareIcon, PencilIcon, TrashIcon,PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
   import { useNavigationStore } from '@/stores/NavItems/Navigation';
@@ -103,16 +158,18 @@
 
   const navStore = useNavigationStore();
   const authStore = useAuthStore();
-  const aboutStore = useAboutStore();
   
-  const newItem = shallowRef({ label: ''})
+  const newItem = ref({ label: ''})
   const editingIndex = ref(-1)
   const isAddingSectionMode = ref(false);
+  const editingSectionKey = ref(null);
+  const editingSectionLabel = ref('');
+  
   const dropdownStates = reactive({})
   const newSection = reactive({
     label: ''
-  });
-
+  })
+  
   Object.keys(navStore.routes).forEach(key => {
     dropdownStates[key] = false
   })
@@ -185,6 +242,52 @@
       newItem.value = { label: '' };
     } catch (error) {
       showAlert(error.message);
+    }
+  };
+
+  const startSectionEdit = (key, currentLabel) => {
+    editingSectionKey.value = key;
+    editingSectionLabel.value = currentLabel;
+  };
+
+  const cancelSectionEdit = () => {
+    editingSectionKey.value = null;
+    editingSectionLabel.value = '';
+  };
+
+  const handleUpdateSection = (sectionKey) => {
+    if (!editingSectionLabel.value.trim()) {
+      showAlert('Please enter a section label', sectionKey);
+      return;
+    }
+
+    try {
+      navStore.updateSection(sectionKey, {
+        label: editingSectionLabel.value.toUpperCase(),
+        path: `/${sectionKey}`,
+        component: DynamicPage
+      });
+      
+      // Reset editing state
+      editingSectionKey.value = null;
+      editingSectionLabel.value = '';
+      
+      // Update routes
+      addDynamicRoutes();
+    } catch (error) {
+      showAlert(error.message, sectionKey);
+    }
+  };
+
+  const handleDeleteSection = (sectionKey) => {
+    const confirmed = confirm("Are you sure you want to delete this section? This will delete all items within it.");
+    if (confirmed) {
+      try {
+        navStore.deleteSection(sectionKey);
+        addDynamicRoutes();
+      } catch (error) {
+        showAlert(error.message, sectionKey);
+      }
     }
   };
 

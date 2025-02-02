@@ -50,38 +50,49 @@ export const useNavigationStore = defineStore('navigation', {
             this.routes[sectionKey].items.push({
               ...item,
               path: formattedPath
-            });
-          },
-          
-          updateItem(sectionKey, index, updatedItem) {
-            if (!this.routes[sectionKey]) {
-              throw new Error(`Section ${sectionKey} does not exist`);
-            }
+          });
+        },
+         
+        updateSection(sectionkey, updatedSection) {
+          if (!this.routes[sectionkey]) {
+            throw new Error(`Section ${sectionkey} does not exist`)
+          }
+
+          const existingItems = this.routes[sectionkey].items
+          this.routes[sectionkey] = {
+            ...updatedSection,
+            items: updatedSection.items || existingItems,
+            path: `/${sectionkey}`
+          }
+        },
+
+        updateItem(sectionKey, index, updatedItem) {
+          if (!this.routes[sectionKey]) {
+            throw new Error(`Section ${sectionKey} does not exist`);
+          }
             
-            const formattedPath = `/${sectionKey}/${updatedItem.path.replace(/^\//, '')}`;
-            this.routes[sectionKey].items.splice(index, 1, {
-              ...updatedItem,
-              path: formattedPath
-            });
-          },
+          const formattedPath = `/${sectionKey}/${updatedItem.path.replace(/^\//, '')}`;
+          this.routes[sectionKey].items.splice(index, 1, {
+            ...updatedItem,
+            path: formattedPath
+          });
+        },
 
         deleteItem(sectionKey, index) {
-            if (!this.routes[sectionKey]) {
-                throw new Error(`Section ${sectionKey} does not exist`);
-            }
-             
-            this.routes[sectionKey].items.splice(index, 1);
+          if (!this.routes[sectionKey]) {
+            throw new Error(`Section ${sectionKey} does not exist`);
+          }
+          this.routes[sectionKey].items.splice(index, 1);
         },
 
-        deleteISection(sectionKey) {
-            if (!this.routes[sectionKey]) {
-                throw new Error(`Section ${sectionKey} does not exist`);
-            }
+        deleteSection(sectionKey) {
+          if (!this.routes[sectionKey]) {
+            throw new Error(`Section ${sectionKey} does not exist`);
+          }
              
-            delete this.routes[sectionKey];
+          delete this.routes[sectionKey];
         },
         validateSection(sectionkey, config) {
-            
         },
         validateItem(sectionKey, label) {
             const section = this.routes[sectionKey];

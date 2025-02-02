@@ -1,5 +1,6 @@
 <template>
     <li 
+      ref="parentRef"
       class="relative"
       @mouseenter="openDropdown"
       @mouseleave="handleMouseLeave"
@@ -10,7 +11,7 @@
           :to="href"
           :class="{ 'text-gray-300 font-semibold': isParentActive }"
         >
-            {{ label }}
+          {{ label }}
         </RouterLink>
         <span
         v-if="items.length > 0" 
@@ -33,10 +34,10 @@
   
       <!-- Dropdown Menu -->
       <div 
+      ref="dropdownRef"
       v-show="isOpen"
-      class="absolute z-10 left-0 mt-2 -translate-x-2  bg-black rounded-lg shadow-lg min-w-[240px] transition-all ease-in-out"
-      @mouseenter="isHoveringDropdown = true"
-      @mouseleave="isHoveringDropdown = false"
+      class="absolute z-10 left-0  -translate-x-2  bg-black rounded-lg shadow-lg min-w-[240px] transition-all ease-in-out"
+     
     >
       <div class="p-2">
         <!-- Regular Items -->
@@ -68,14 +69,22 @@
   </template>
   
   <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, useSlots, computed } from 'vue'
   import { RouterLink, useRoute } from 'vue-router'
   import { useAuthStore } from '@/stores/Auth'
 
   const authStore = useAuthStore()
   const route = useRoute()
+  const slots = useSlots()
+
+  const parentRef = ref(null)
+  const dropdownRef = ref(null)
   
   const isAuthenticated = computed(() => authStore.checkAuth)
+  const shouldApplyPadding = computed(() => {
+    return !isAuthenticated.value || !slots.default
+  })
+
   const props = defineProps({
     label: {
       type: String,
@@ -119,18 +128,16 @@
 
 
   const openDropdown = () => {
-    if (closeTimeout.value) {
-      clearTimeout(closeTimeout.value)
-    }
     emit('update:isOpen', true)
   }
 
-  const handleMouseLeave = () => {
-    closeTimeout.value = setTimeout(() => {
-      if (!isHoveringDropdown.value) {
-        emit('update:isOpen', false)
-      }
-    }, 50)
+  const handleMouseLeave = (event) => {
+    const isLeavingToDropdown = dropdownRef.value?.contains(event.relatedTarget)
+    const isLeavingToParent = parentRef.value?.contains(event.relatedTarget)
+
+    if (!isLeavingToDropdown && !isLeavingToParent) {
+      emit('update:isOpen', false)
+    }
   }
 
   const handleItemHover = () => {
