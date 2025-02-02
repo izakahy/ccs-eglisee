@@ -1,5 +1,6 @@
 <template>
     <ul class="hidden md:flex space-x-8 text-2xl">
+    
     <template v-for="(section, key) in navStore.routes" :key="key">
       <DropdownMenuItem
       :label="section.label"
@@ -54,6 +55,37 @@
     <li><a target="_blank" href="https://www.youtube.com/@CommunauteCompassionShediac">WATCH</a></li>
     <li><RouterLink :to="{ name: 'create' }">FORWARD</RouterLink></li>
     <li><RouterLink :to="{ name: 'create' }">GIVE</RouterLink></li>
+  
+     <!-- Add Section Form -->
+      <div v-if="isAuthenticated" class="items-center">
+        <div v-if="isAddingSectionMode" class="flex gap-2 items-center">
+          <input
+            v-model="newSection.label"
+            placeholder="Section Label (e.g. 'SERVICES')"
+            class="px-2 py-2 bg-gray-50 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+          >
+          <button
+            @click="handleAddSection"
+            class="p-2 text-white bg-green-500 hover:bg-green-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          >
+            <PencilSquareIcon class="w-5 h-5" />
+          </button>
+          <button
+            @click="isAddingSectionMode = false"
+            class="p-2 text-white bg-red-500 hover:bg-red-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            <XMarkIcon class="w-5 h-5" />
+          </button>
+        </div>
+        <button
+          v-else
+          @click="isAddingSectionMode = true"
+          class="p-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          title="Add Section"
+        >
+          <PlusIcon class="w-5 h-5" />
+        </button>
+    </div>
   </ul>
 </template>
   
@@ -63,9 +95,10 @@
   import DropdownMenuItem from './DropdownMenuItem.vue';
   import { useAboutStore } from '@/stores/NavItems/About';
   import { useAuthStore } from '@/stores/Auth';
-  import { PencilSquareIcon, PencilIcon, TrashIcon } from '@heroicons/vue/24/outline';
+  import { PencilSquareIcon, PencilIcon, TrashIcon,PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
   import { useNavigationStore } from '@/stores/NavItems/Navigation';
   import { addDynamicRoutes } from '@/router';
+  import DynamicPage from '../Pages/DynamicPage.vue';
 
 
   const navStore = useNavigationStore();
@@ -74,7 +107,11 @@
   
   const newItem = shallowRef({ label: ''})
   const editingIndex = ref(-1)
+  const isAddingSectionMode = ref(false);
   const dropdownStates = reactive({})
+  const newSection = reactive({
+    label: ''
+  });
 
   Object.keys(navStore.routes).forEach(key => {
     dropdownStates[key] = false
@@ -96,7 +133,6 @@
     alert(msg);
     dropdownStates[sectionKey] = wasOpen;
   }
-
 
   const handleAdd = (sectionKey) => {
     const validation = navStore.validateItem(sectionKey, newItem.value.label);
@@ -152,7 +188,6 @@
     }
   };
 
-
   const handleDelete = (sectionKey, index) => {
     const wasOpen = dropdownStates[sectionKey]
     
@@ -163,6 +198,35 @@
       addDynamicRoutes();
 
       dropdownStates[sectionKey] = true;
+    }
+  };
+
+  const handleAddSection = () => {
+    if (!newSection.label.trim()) {
+      alert('Please enter a section label');
+      return;
+    }
+
+    // Generate the section key from the label
+    const sectionKey = newSection.label
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-');
+    
+    try {
+      navStore.addSection(sectionKey, {
+        label: newSection.label.toUpperCase(),
+        component: DynamicPage
+      });
+      
+      // Reset form
+      newSection.label = '';
+      isAddingSectionMode.value = false;
+      
+      // Update routes
+      addDynamicRoutes();
+    } catch (error) {
+      console.error(error.message)
     }
   };
 

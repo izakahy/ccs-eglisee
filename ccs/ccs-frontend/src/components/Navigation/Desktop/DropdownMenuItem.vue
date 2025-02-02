@@ -12,7 +12,9 @@
         >
             {{ label }}
         </RouterLink>
-        <span class="ml-1">
+        <span
+        v-if="items.length > 0" 
+        class="ml-1">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-4 w-4 transition-transform duration-200"
@@ -32,14 +34,15 @@
       <!-- Dropdown Menu -->
       <div 
       v-show="isOpen"
-      class="absolute z-10 left-0 mt-2 -translate-x-2 bg-black rounded-lg shadow-lg min-w-[240px] transition-all ease-in-out"
+      class="absolute z-10 left-0 mt-2 -translate-x-2  bg-black rounded-lg shadow-lg min-w-[240px] transition-all ease-in-out"
       @mouseenter="isHoveringDropdown = true"
       @mouseleave="isHoveringDropdown = false"
     >
       <div class="p-2">
         <!-- Regular Items -->
         <ul class="space-y-1">
-          <li 
+          <li
+           
            v-for="item in items"
            :key="item.path"
            @mouseenter="handleItemHover"
@@ -67,9 +70,12 @@
   <script setup>
   import { ref, computed } from 'vue'
   import { RouterLink, useRoute } from 'vue-router'
+  import { useAuthStore } from '@/stores/Auth'
 
+  const authStore = useAuthStore()
   const route = useRoute()
   
+  const isAuthenticated = computed(() => authStore.checkAuth)
   const props = defineProps({
     label: {
       type: String,

@@ -80,6 +80,9 @@ export const useNavigationStore = defineStore('navigation', {
              
             delete this.routes[sectionKey];
         },
+        validateSection(sectionkey, config) {
+            
+        },
         validateItem(sectionKey, label) {
             const section = this.routes[sectionKey];
             if (!section) throw new Error('Invalid section');
