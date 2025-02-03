@@ -8,7 +8,7 @@ export const useNavigationStore = defineStore('navigation', {
             about: {
                 path: '/about',
                 label: 'ABOUT',
-                component: DynamicPage,
+                component: markRaw(DynamicPage),
                 items: [
                     { label: 'Our Story', path: '/about/story' },
                     { label: 'Mission', path: '/about/mission' },
@@ -18,7 +18,7 @@ export const useNavigationStore = defineStore('navigation', {
             connect: {
                 path: '/connect',
                 label: 'CONNECT',
-                component: DynamicPage,
+                component: markRaw(DynamicPage),
                 items: [
                     {label: 'House Fellowship', path: '/connect/house-fellowship'}
                 ]

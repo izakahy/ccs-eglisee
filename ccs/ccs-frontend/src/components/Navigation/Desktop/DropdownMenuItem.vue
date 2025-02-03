@@ -96,7 +96,8 @@
     },
     isOpen: {
       type: Boolean,
-      required: true
+      required: true,
+      default: false
     },
     items: {
       type: Array,
@@ -115,7 +116,6 @@
   const isParentActive = computed(() => {
     return route.path.startsWith(props.href)
   })
-
 
   const isActive = (path) => {
     // Match exact path or nested paths

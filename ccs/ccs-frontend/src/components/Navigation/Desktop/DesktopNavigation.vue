@@ -3,6 +3,7 @@
     
     <template v-for="(section, key) in navStore.routes" :key="key">
       <DropdownMenuItem
+      v-if="dropdownStates[key] !== undefined"
       :label="section.label"
       :href="section.path"
       :is-open="dropdownStates[key]"
@@ -14,7 +15,7 @@
       <div v-if="isAuthenticated" class="px-6 pt-1 pb-6 space-y-4 border-t bg-gradient-to-r from-gray-900 to-stone-900 border-gray-400 mt-4 w-full max-w-2xl mx-auto rounded-xl shadow-md">
         <!-- Section Edit Header -->
         <div class="mb-4">
-          <p class="text-sm text-gray-300 font-semibold text-center">Edit Section</p>
+          <p class="text-sm text-gray-300 font-semibold text-center">Add/Edit Section</p>
         </div>
 
         <!-- Section Content -->
@@ -146,8 +147,8 @@
 </template>
   
 <script setup>
-  import { ref, computed, reactive, shallowRef } from 'vue';
-  import { RouterLink } from 'vue-router'
+  import { ref, computed, reactive, watch, markRaw } from 'vue';
+  import { RouterLink, useRoute, useRouter } from 'vue-router'
   import DropdownMenuItem from './DropdownMenuItem.vue';
   import { useAuthStore } from '@/stores/Auth';
   import { PencilSquareIcon, PencilIcon, TrashIcon,PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
@@ -155,9 +156,10 @@
   import { addDynamicRoutes } from '@/router';
   import DynamicPage from '../Pages/DynamicPage.vue';
 
-
   const navStore = useNavigationStore();
   const authStore = useAuthStore();
+  const router = useRouter()
+  const route = useRoute()
   
   const newItem = ref({ label: ''})
   const editingIndex = ref(-1)
@@ -170,10 +172,7 @@
     label: ''
   })
   
-  Object.keys(navStore.routes).forEach(key => {
-    dropdownStates[key] = false
-  })
-
+  const routeKeys = computed(() => Object.keys(navStore.routes))
   const isAuthenticated = computed(() => authStore.checkAuth());
   
   const HandleDropdownToggle = (key, value) => {
@@ -268,7 +267,6 @@
         component: DynamicPage
       });
       
-      // Reset editing state
       editingSectionKey.value = null;
       editingSectionLabel.value = '';
       
@@ -279,10 +277,14 @@
     }
   };
 
-  const handleDeleteSection = (sectionKey) => {
+  const handleDeleteSection = async (sectionKey) => {
     const confirmed = confirm("Are you sure you want to delete this section? This will delete all items within it.");
     if (confirmed) {
       try {
+        if (route.path.startsWith(`/${sectionKey}`)) {
+            await router.push({ name: 'notFound' });
+        }
+
         navStore.deleteSection(sectionKey);
         addDynamicRoutes();
       } catch (error) {
@@ -291,16 +293,26 @@
     }
   };
 
-  const handleDelete = (sectionKey, index) => {
+  const handleDelete = async (sectionKey, index) => {
     const wasOpen = dropdownStates[sectionKey]
     
     const confrimed = confirm("Are you sure you want to delete this?")
     dropdownStates[sectionKey] = wasOpen
     if (confrimed) {
-      navStore.deleteItem(sectionKey, index);
-      addDynamicRoutes();
-
-      dropdownStates[sectionKey] = true;
+     try {
+       const itemPath = navStore.routes[sectionKey]?.items[index]?.path;
+            
+       if (itemPath && route.path === itemPath) {
+          await router.push({ name: 'notFound' });
+       }
+       
+       navStore.deleteItem(sectionKey, index);
+       addDynamicRoutes();
+ 
+       dropdownStates[sectionKey] = true;
+     } catch (error) {
+       showAlert(error.message, sectionKey)
+     }
     }
   };
 
@@ -319,7 +331,7 @@
     try {
       navStore.addSection(sectionKey, {
         label: newSection.label.toUpperCase(),
-        component: DynamicPage
+        component: markRaw(DynamicPage)
       });
       
       // Reset form
@@ -345,4 +357,18 @@
   })
   
   defineEmits(['update:modelValue'])
+
+  watch(routeKeys, (newKeys) => {
+      newKeys.forEach(key => {
+          if (!(key in dropdownStates)) {
+              dropdownStates[key] = false
+          }
+      })
+      // Remove old keys
+      Object.keys(dropdownStates).forEach(key => {
+          if (!newKeys.includes(key)) {
+              delete dropdownStates[key]
+          }
+      })
+  }, { immediate: true })
   </script>

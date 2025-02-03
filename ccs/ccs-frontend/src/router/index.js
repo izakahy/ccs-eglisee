@@ -63,12 +63,19 @@ const router = createRouter({
   ],
 })
 
+router.onError((error, to) => {
+  console.error('Navigation error:', error);
+  if (error.name.includes('NavigationFailure')) {
+    router.push({ name: 'notFound' });
+  }
+});
+
 export function addDynamicRoutes() {
   const navigationStore = useNavigationStore();
  
   // Remove existing dynamic routes
   router.getRoutes().forEach(route => {
-    if (route.meta?.isDynamic) {
+    if (route.meta?.isDynamic && route.name) {
       router.removeRoute(route.name); // Remove by route name
     }
   });

@@ -20,8 +20,12 @@ export const useAuthStore = defineStore('authStore', {
             message: null,
             isAuthenticated: false,
             isLoading: false,
+            isLoggedIn: false,
         }
     },
+    // getters: {
+    //     isLoggedIn: (state) => state.isAuthenticated && Boolean(state.token)
+    // },
     actions: {
         init() {
             const token = localStorage.getItem('token');
@@ -152,7 +156,7 @@ export const useAuthStore = defineStore('authStore', {
 
         // Helper to check if user is authenticated
         checkAuth() {
-            return this.isAuthenticated && this.token;
+            return this.isAuthenticated && Boolean(this.token);
         }
     }
 });

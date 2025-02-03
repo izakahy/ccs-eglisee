@@ -33,7 +33,7 @@ import InfoCard from '@/components/Cards/InfoCard.vue';
         type="content"
         title="ABOUT PASTOR"
         container-class="flex flex-col justify-evenly"
-        showButton="true"
+        :showButton="true"
         >
         <p class="text-center lg:text-start text-lg">
           Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing aenean.
