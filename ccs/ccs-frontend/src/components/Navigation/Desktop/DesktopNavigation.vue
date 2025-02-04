@@ -13,14 +13,11 @@
     >
       <!-- Admin Controls (outside regular items) -->
       <div v-if="isAuthenticated" class="px-6 pt-1 pb-6 space-y-4 border-t bg-gradient-to-r from-gray-900 to-stone-900 border-gray-400 mt-4 w-full max-w-2xl mx-auto rounded-xl shadow-md">
-        <!-- Section Edit Header -->
         <div class="mb-4">
           <p class="text-sm text-gray-300 font-semibold text-center">Add/Edit Section</p>
         </div>
 
-        <!-- Section Content -->
         <div class="flex items-center justify-between gap-2 mb-4 border-b border-gray-400 pb-4">
-          
           <div class="flex-1">
             <input
               v-if="editingSectionKey === key"
@@ -108,7 +105,6 @@
     </DropdownMenuItem>
     </template>
     
-    <li><RouterLink :to="{ name: 'create' }">EVENT</RouterLink></li>
     <li><a target="_blank" href="https://www.youtube.com/@CommunauteCompassionShediac">WATCH</a></li>
     <li><RouterLink :to="{ name: 'create' }">FORWARD</RouterLink></li>
     <li><RouterLink :to="{ name: 'create' }">GIVE</RouterLink></li>
@@ -154,7 +150,7 @@
   import { PencilSquareIcon, PencilIcon, TrashIcon,PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline';
   import { useNavigationStore } from '@/stores/NavItems/Navigation';
   import { addDynamicRoutes } from '@/router';
-  import DynamicPage from '../Pages/DynamicPage.vue';
+  import DynamicPage from '@/components/Pages/DynamicPage.vue';
 
   const navStore = useNavigationStore();
   const authStore = useAuthStore();

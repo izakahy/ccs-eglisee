@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { markRaw } from "vue";
-import DynamicPage from "@/components/Navigation/Pages/DynamicPage.vue";
+import DynamicPage from "@/components/Pages/DynamicPage.vue";
 
 export const useNavigationStore = defineStore('navigation', {
     state: () => ({
@@ -22,7 +22,7 @@ export const useNavigationStore = defineStore('navigation', {
                 items: [
                     {label: 'House Fellowship', path: '/connect/house-fellowship'}
                 ]
-            }
+            },
         }
     }),
     

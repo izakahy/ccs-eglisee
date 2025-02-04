@@ -4,7 +4,7 @@ import { RouterLink, RouterView } from 'vue-router'
 import { useAuthStore } from '@/stores/Auth';
 import Logout from './Navigation/Auth/Logout.vue';
 import Mobile from './Navigation/Mobile/Mobile.vue';
-import Hamburger from './Navigation/Mobile/MobileHeader.vue';
+import Hamburger from './Navigation/Mobile/HamburgerMenu.vue';
 import Desktop from './Navigation/Desktop/DesktopNavigation.vue';
 import { useAboutStore } from '@/stores/NavItems/About';
 
@@ -71,7 +71,6 @@ watch(isMenuOpen, (newValue) => {
             @toggle="isMenuOpen = !isMenuOpen"
           />
 
-
           <!-- Desktop Navigation -->
           <Desktop
             v-model="submenuOpen"
@@ -80,7 +79,10 @@ watch(isMenuOpen, (newValue) => {
         </div>
 
         <!-- Mobile Navigation -->
-        <Mobile :is-menu-open="isMenuOpen" />
+        <Mobile 
+          :is-menu-open="isMenuOpen"
+          @close-menu="isMenuOpen = false"
+        />
       </div>
     </nav>
   </header>
