@@ -16,9 +16,9 @@ import InfoCard from '@/components/Cards/InfoCard.vue';
       <InfoCard />
       <div class="mt-11 mb-11">
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-11 gap-y-5 mx-auto max-w-6xl">
-          <HeroCard bgColor="bg-red-800" title="Title 1"></HeroCard>
-          <HeroCard bgColor="bg-blue-500" title="Title 2"></HeroCard>
-          <HeroCard bgColor="bg-green-500" title="Title 3"></HeroCard>
+          <HeroCard id="card1" bgColor="bg-red-800" ></HeroCard>
+          <HeroCard id="card2" bgColor="bg-blue-500"></HeroCard>
+          <HeroCard id="card3" bgColor="bg-green-500"></HeroCard>
         </div>
       </div>
     </div>
