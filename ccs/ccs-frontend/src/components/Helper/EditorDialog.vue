@@ -4,18 +4,33 @@
                 <h3 class="text-lg font-medium mb-4">Edit {{ editType }}</h3>
                   
                 <div class="flex-1 overflow-y-auto">
-                      <div v-if="editType === 'title'">
-                          <input
-                              v-model="localTitle"
-                              type="text"
-                              class="w-full p-2 border rounded mb-4"
-                              maxlength="50"
-                          />
-                      </div>
+                  <div v-if="editType === 'title'" class="relative">
+                    <input
+                      v-model="localTitle"
+                      type="text"
+                      class="w-full p-2 border rounded mb-4"
+                      maxlength="50"
+                    />
+                    <div 
+                      class="absolute right-2 top-2 text-sm flex items-center gap-2"
+                      :class="{
+                        'text-gray-500': localTitle.length < 40,
+                        'text-yellow-600': localTitle.length >= 40 && localTitle.length < 50,
+                        'text-red-600': localTitle.length === 50
+                      }"
+                    >
+                      <i 
+                        v-if="localTitle.length === 50"
+                        class="fa-solid fa-triangle-exclamation"
+                        title="Character limit reached"
+                      ></i>
+                      {{ localTitle.length }}/50
+                    </div>
+                  </div>
                       
-                      <div v-else>
-                          <div v-if="editor" class="border rounded-t-lg">
-                              <div class="flex gap-1 p-2 border-b flex-wrap">
+                  <div v-else>
+                      <div v-if="editor" class="border rounded-t-lg">
+                        <div class="flex gap-1 p-2 border-b flex-wrap">
                                   
                                   <!-- Text Formatting -->
                                   <button 
@@ -118,32 +133,59 @@
                       </div>
                 </div>
 
-                <div class="flex justify-end gap-2 mt-4 pt-4 border-t">
-                  <button
-                     @click="cancelEdit"
-                    class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                <div 
+                  class="flex gap-2 mt-4 pt-4 border-t"
+                  :class="{
+                    'justify-between' : editType !== 'title',
+                    'justify-end' : editType === 'title'
+                  }"
+                >
+                  <div 
+                    v-if="editType !== 'title'"
+                    class="text-sm flex items-center gap-2"
+                    :class="{
+                      'text-gray-500': !isNearLimit,
+                      'text-yellow-600': isNearLimit && !isAtLimit,
+                      'text-red-600': isAtLimit
+                    }"
+                    :title="characterLimitTitle"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    @click="saveEdit"
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                      Save
-                  </button>
+                    <i 
+                      v-if="isAtLimit"
+                      class="fa-solid fa-triangle-exclamation"
+                    ></i>
+                    <i 
+                      v-else-if="isNearLimit"
+                      class="fa-solid fa-exclamation"
+                    ></i>
+                    <span>Characters: {{ editor?.storage.characterCount.characters() }}/1000</span>
+                  </div>
+                  
+                  <div class="flex gap-2">
+                    <button
+                      @click="cancelEdit"
+                      class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      @click="saveEdit"
+                      class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                      :disabled="editor?.storage.characterCount.characters() > 2000"
+                    >
+                        Save
+                    </button>
+                  </div>
                 </div>
               </div>
-          </div>
+      </div>
   </template>
 
-  <script setup>
+ <script setup>
   import { ref, watch, nextTick, onBeforeUnmount, computed } from 'vue'
   import { useEditor, EditorContent } from '@tiptap/vue-3'
-  import StarterKit from '@tiptap/starter-kit'
-  import Typography from '@tiptap/extension-typography'
-  import TextAlign from '@tiptap/extension-text-align'
-  import Highlight from '@tiptap/extension-highlight'
-import Underline from '@tiptap/extension-underline'
+  import CharacterCount from '@tiptap/extension-character-count'
+  import { extensions, editorProps } from '@/tiptap/config'
 
   const props = defineProps({
     modelValue: Boolean,
@@ -154,22 +196,19 @@ import Underline from '@tiptap/extension-underline'
 
   const emit = defineEmits(['update:modelValue', 'update:title', 'update:body'])
   const localTitle = ref(props.titleValue)
+  const CHAR_LIMIT = 1000
+  const WARNING_THRESHOLD = 0.8
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        heading: { levels: [1, 2, 3] },
-      }),
-      Typography,
-      Underline,
-      TextAlign.configure({ 
-        types: ['heading', 'paragraph'],
-        defaultAlignment: 'left'
-      }),
-      Highlight.configure({ multicolor: true })
+      ...extensions,
+      CharacterCount.configure({
+        limit: 1000
+      })
     ],
     content: props.bodyValue,
-    editable: false
+    editable: false,
+    editorProps
   })
 
   const currentHeadingLevel = computed(() => {
@@ -186,6 +225,59 @@ import Underline from '@tiptap/extension-underline'
       }
     }
   }
+
+  const handleKeydown = (e) => {
+    if (!props.modelValue) return
+    
+    const focusable = [
+      ...document.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+    ].filter(el => el.offsetParent !== null) // Only visible elements
+    
+    if (e.key === 'Tab') {
+      if (focusable.length === 0) {
+        e.preventDefault()
+        return
+      }
+      
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      
+      if (e.shiftKey && document.activeElement === first) {
+        last.focus()
+        e.preventDefault()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        first.focus()
+        e.preventDefault()
+      }
+    }
+    
+    if (e.key === 'Escape') {
+      cancelEdit()
+    }
+  }
+
+  watch(() => props.modelValue, (show) => {
+    if (show) {
+      window.addEventListener('keydown', handleKeydown)
+    } else {
+      window.removeEventListener('keydown', handleKeydown)
+    }
+  })
+
+  watch(() => props.modelValue, (show) => {
+    if (show) {
+      document.body.classList.add('overflow-hidden')
+      // Focus first interactive element
+      if (props.editType === 'title') {
+        document.querySelector('input')?.focus()
+      } else {
+        editor.value?.commands.focus()
+      }
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+  })
+
 
   watch(() => props.modelValue, (show) => {
     if (show) {
@@ -221,15 +313,41 @@ import Underline from '@tiptap/extension-underline'
     try {
       if (props.editType === 'title') {
         emit('update:title', localTitle.value)
-      } else if (editor.value) {
+      } else if (editor.value && !isAtLimit.value) {
         const html = editor.value.getHTML()
-        emit('update:body', html === '<p></p>' ? '' : html)
+
+        const isEmpty = html === '<p></p>' || 
+                     html === '<ul></ul>' || 
+                     html === '<ol></ol>' || 
+                     /^<([a-z]+)[^>]*>\s*<\/\1>$/.test(html)
+
+        emit('update:body', isEmpty ? '' : html)
       }
       emit('update:modelValue', false)
     } catch (error) {
       console.error('Save error:', error)
     }
   }
+
+  const isNearLimit = computed(() => {
+    const charCount = editor.value?.storage.characterCount.characters() || 0
+    return charCount >= CHAR_LIMIT * WARNING_THRESHOLD
+  })
+
+  const isAtLimit = computed(() => {
+    const charCount = editor.value?.storage.characterCount.characters() || 0
+    return charCount >= CHAR_LIMIT
+  })
+
+  const characterLimitTitle = computed(() => {
+    if (isAtLimit.value) {
+      return 'Character limit reached'
+    }
+    if (isNearLimit.value) {
+      return 'Approaching character limit'
+    }
+    return ''
+  })
 
   onBeforeUnmount(() => {
     if (editor.value) {
@@ -239,8 +357,7 @@ import Underline from '@tiptap/extension-underline'
   </script>
 
 <style scoped>
-  .white-space-preserve {
-    white-space: pre-wrap;
+  .text-sm {
+    transition: color 0.2s ease-in-out;
   }
-
 </style>

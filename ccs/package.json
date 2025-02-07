@@ -13,5 +13,12 @@
         "postcss": "^8.4.47",
         "tailwindcss": "^3.4.13",
         "vite": "^6.0"
+    },
+    "dependencies": {
+        "@tiptap/extension-paragraph": "^2.11.5",
+        "@tiptap/extension-text": "^2.11.5",
+        "dompurify": "^3.2.4",
+        "prosemirror-model": "^1.24.1",
+        "truncate-html": "^1.2.0"
     }
 }

@@ -23,7 +23,7 @@ const props = defineProps({
   },
   ytURL: {
     type: String,
-    default: 'https://www.youtube-nocookie.com/embed/YA2Lxfw4SSw?autoplay=0&mute=1&loop=1&modestbranding=1&rel=0&enablejsapi=1&playlist=YA2Lxfw4SSw',
+    default: 'https://www.youtube-nocookie.com/embed/YA2Lxfw4SSw?mute=1&loop=1&modestbranding=1&rel=0&enablejsapi=1&playlist=YA2Lxfw4SSw',
   }
 });
 
@@ -42,7 +42,7 @@ const extractVideoID = (url) => {
 
 const constructEmbedURL = (videoID) => {
   const baseURL = 'https://www.youtube-nocookie.com/embed/';
-  const settings = 'autoplay=0&mute=1&loop=1&modestbranding=1&rel=0&enablejsapi=1';
+  const settings = 'mute=1&loop=1&modestbranding=1&rel=0&enablejsapi=1';
   const playlistParam = videoID ? `&playlist=${videoID}` : ''; 
   return `${baseURL}${videoID}?${settings}${playlistParam}`;
 };
@@ -52,7 +52,7 @@ const updateYouTubeURL = () => {
   if (videoID) {
     ytURL.value = constructEmbedURL(videoID);
     showURLInput.value = false
-    playVideo()
+    // playVideo()
   } else {
     alert('Invalid YouTube URL. Please provide a valid YouTube video link.');
     showURLInput.value = true
@@ -122,7 +122,7 @@ const createPlayer = () => {
 };
 
 const onPlayerReady = (event) => {
-  event.target.playVideo();
+  // event.target.playVideo();
 };
 
 const onPlayerStateChange = (event) => {

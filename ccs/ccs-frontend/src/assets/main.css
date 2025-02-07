@@ -3,58 +3,104 @@
 @tailwind utilities;
 
 @layer components {
-  .editor-content h1 {
-    @apply text-3xl font-bold;
-  }
-  .editor-content h2 {
-    @apply text-2xl font-bold;
-  }
-  .editor-content h3 {
-    @apply text-xl font-bold;
-  }
-  
-  /* For the display area */
-  .prose-preview h1 {
-    @apply text-3xl font-bold;
-  }
-  .prose-preview h2 {
-    @apply text-2xl font-bold;
-  }
-  .prose-preview h3 {
-    @apply text-xl font-bold;
+  /* Base editor styles */
+  .editor-content {
+    @apply whitespace-pre-wrap; /* Preserve spaces and line breaks */
   }
 
+  /* Headings */
+  .editor-content h1, .prose-preview h1 {
+    @apply text-3xl font-bold mb-4 mt-6;
+  }
+  .editor-content h2, .prose-preview h2 {
+    @apply text-2xl font-bold mb-3 mt-5;
+  }
+  .editor-content h3, .prose-preview h3 {
+    @apply text-xl font-bold mb-2 mt-4;
+  }
 
-  /* List styles for editor content */
+  /* Lists - Editor & Preview */
   .editor-content ul,
-  .editor-content ol {
-    @apply pl-8 my-4;
+  .editor-content ol,
+  .prose-preview ul,
+  .prose-preview ol {
+    @apply my-3 pl-6 list-outside;
+    margin-left: 0;
   }
 
-  .editor-content ul {
+  .editor-content ul,
+  .prose-preview ul {
     @apply list-disc;
   }
 
-  .editor-content ol {
+  .editor-content ol,
+  .prose-preview ol {
     @apply list-decimal;
   }
 
-  .editor-content li {
-    @apply mb-2;
+  .editor-content li,
+  .prose-preview li {
+    @apply mb-1.5 leading-relaxed;
   }
 
-  /* Optional: Add styles for nested lists */
+  /* Nested lists */
   .editor-content ul ul,
-  .editor-content ol ul {
+  .editor-content ol ul,
+  .prose-preview ul ul,
+  .prose-preview ol ul {
+    @apply pl-6 mt-1;
     list-style-type: circle;
   }
 
   .editor-content ol ol,
-  .editor-content ul ol {
+  .editor-content ul ol,
+  .prose-preview ol ol,
+  .prose-preview ul ol {
+    @apply pl-6 mt-1;
     list-style-type: lower-roman;
   }
+
+  /* Paragraph spacing */
+  .editor-content p,
+  .prose-preview p {
+    @apply my-3 leading-relaxed;
+  }
+
+  /* Preserve spaces in text */
+  .editor-content pre,
+  .prose-preview pre {
+    @apply whitespace-pre-wrap;
+  }
+
+
+  .tiptap-content {
+    .paragraph-node {
+      @apply mb-3 text-gray-800;
+    }
+    
+    .heading-node {
+      @apply font-bold text-gray-900;
+      &.h1 { @apply text-2xl mb-4; }
+      &.h2 { @apply text-xl mb-3; }
+      &.h3 { @apply text-lg mb-2; }
+    }
   
+    .highlight-node {
+      @apply bg-yellow-200 px-1;
+    }
+  
+    ul, ol {
+      @apply pl-6 my-2;
+      li {
+        @apply mb-1;
+      }
+    }
+  
+  }
 }
+
+
+
 
 html, body {
   margin: 0;

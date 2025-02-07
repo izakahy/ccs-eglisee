@@ -51,7 +51,7 @@ Accept: application/json
 
 ### Test posts endpoint
 GET {{ uri }}/posts
-Authorization: Bearer 42|ahN52jEdp71mFehY6gJYqFwlGt6RBm1z0OLPsye357c42d97
+Authorization: Bearer 87|IrrTBgNMi2mdysksPVypj2A3QT4Ob5t9XNWL7NP4a32e32c8
 Accept: application/json
 
 

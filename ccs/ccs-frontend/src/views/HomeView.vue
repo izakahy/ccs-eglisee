@@ -1,10 +1,25 @@
 <script setup>
+import { ref } from 'vue';
 import HeroCard from '@/components/Cards/HeroCard.vue';
 import YoutubePlayer from '@/components/YoutubePlayer.vue';
 import InvitationCard from '@/components/Cards/InvitationCard.vue';
 import MainCard from '@/components/Cards/MainCard.vue';
 import InfoCard from '@/components/Cards/InfoCard.vue';
+import { XMarkIcon } from '@heroicons/vue/24/solid'
 
+const cardData = ref([
+  { id: 'card1', bgColor: 'bg-red-800'},
+  { id: 'card2', bgColor: 'bg-blue-500'},
+  { id: 'card3', bgColor: 'bg-green-500'},
+])
+
+const removeCard = (index) => {
+  const isConfirmed = confirm("Are you sure you want to delete this?")
+
+  if (isConfirmed){
+    cardData.value.splice(index, 1)
+  }
+}
 </script>
 
 <template>
@@ -15,10 +30,20 @@ import InfoCard from '@/components/Cards/InfoCard.vue';
     <div class="p-5 py-16 px-4 sm:px-6 lg:px-8">
       <InfoCard />
       <div class="mt-11 mb-11">
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-11 gap-y-5 mx-auto max-w-6xl">
-          <HeroCard id="card1" bgColor="bg-red-800" ></HeroCard>
-          <HeroCard id="card2" bgColor="bg-blue-500"></HeroCard>
-          <HeroCard id="card3" bgColor="bg-green-500"></HeroCard>
+        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto_1fr] lg:grid-cols-[1fr_auto_auto_auto_1fr] gap-11 mx-auto max-w-6xl">
+          <div class="hidden md:block lg:block col-span-1"></div>
+          <div v-for="(card, index) in cardData" :key="card.id" class="relative">
+            <button 
+              @click="() => removeCard(index)" 
+              class="absolute -top-4 right-0 text-white bg-red-500 hover:bg-red-700 rounded-lg focus:outline-none"
+              aria-label="Remove card"
+              title="Remove card"
+            >
+              <XMarkIcon class="h-8 w-8" />
+            </button>
+            <HeroCard :id="card.id" :bgColor="card.bgColor" />
+          </div>
+          <div class="hidden md:block lg:block col-span-1"></div>
         </div>
       </div>
     </div>
