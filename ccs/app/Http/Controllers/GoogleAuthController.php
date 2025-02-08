@@ -29,10 +29,13 @@ class GoogleAuthController extends Controller
             $email = $googleUser->getEmail();
 
             if (!$this->isEmailAllowed($email)) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Access denied. Your email domain is not authorized.',
-                ], 403);
+               $errMsg = urlencode('Access denied. Your email domain is not authorized.');
+
+               $frontendCallbackUrl = config('services.frontend.callback_url') . '?' . http_build_query([
+                    'error' => $errMsg
+               ]);
+
+               return redirect($frontendCallbackUrl);
             }
 
             // Check if user exists or create new

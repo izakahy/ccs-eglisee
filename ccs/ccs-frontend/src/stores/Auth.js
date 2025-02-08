@@ -21,11 +21,10 @@ export const useAuthStore = defineStore('authStore', {
             isAuthenticated: false,
             isLoading: false,
             isLoggedIn: false,
+            alertMsg: null,
+            alertType: 'error'
         }
     },
-    // getters: {
-    //     isLoggedIn: (state) => state.isAuthenticated && Boolean(state.token)
-    // },
     actions: {
         init() {
             const token = localStorage.getItem('token');
@@ -42,10 +41,20 @@ export const useAuthStore = defineStore('authStore', {
             }
         },
 
-     
         async handleCallBack() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
+                
+                if (urlParams.has('error')) {
+                    const errMsg = urlParams.get('error');
+                    this.showAlert(decodeURIComponent(errMsg), 'error');
+                    
+                    setTimeout(() => {
+                        router.push({ name: 'home' });
+                    }, 1300)
+                    return;
+                }
+
                 const token = urlParams.get('token');
                 const userEncoded = urlParams.get('user');
         
@@ -64,25 +73,23 @@ export const useAuthStore = defineStore('authStore', {
         
                     // Set default axios header
                     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
-                    // Redirect to home
+
+                    this.showAlert('Successfully logged in!', 'success');
                     router.push({ name: 'home' });
-                }
-        
-                // Handle errors
-                if (urlParams.has('error')) {
-                    this.errors = { auth: urlParams.get('error') };
                 }
             } catch (error) {
                 this.errors = { auth: 'Failed to process login response' };
-                console.error('Callback error:', error);
+                this.showAlert('Failed to process login response. Please try again.', 'error');
+
+                setTimeout(() => {
+                    router.push({ name: 'home' })
+                }, 1300)
             }
         },
         // Start google login
         async googleLogin() {
             window.location.href = 'http://localhost:8000/auth/google/redirect';
         },
-       
        
         async logout() {
             try {
@@ -112,6 +119,7 @@ export const useAuthStore = defineStore('authStore', {
                 delete api.defaults.headers.common['Authorization'];
         
                 this.message = "Successfully logged out!";
+                this.showAlert('Successfully logged out!', 'success');
                 router.push({ name: 'home' });
         
             } catch (error) {
@@ -157,6 +165,16 @@ export const useAuthStore = defineStore('authStore', {
         // Helper to check if user is authenticated
         checkAuth() {
             return this.isAuthenticated && Boolean(this.token);
+        },
+
+        showAlert(msg, type = 'error') {
+            this.alertMsg = msg;
+            this.alertType = type;
+
+            setTimeout(() =>{
+                this.alertMsg = null
+                this.alertType = null
+            }, 1300)
         }
     }
 });

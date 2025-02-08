@@ -32,7 +32,10 @@ const aboutItems = computed(() =>
 
 // Logout function
 const handleLogout = async () => {
-    await authStore.logout(); 
+    if (authStore.checkAuth()) {
+      await authStore.logout(); 
+      alert('Seccessfully logged out!')
+    }
 };
 
 const isAuthenticated = computed(() => authStore.checkAuth());

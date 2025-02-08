@@ -1,11 +1,15 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import HeroCard from '@/components/Cards/HeroCard.vue';
 import YoutubePlayer from '@/components/YoutubePlayer.vue';
 import InvitationCard from '@/components/Cards/InvitationCard.vue';
 import MainCard from '@/components/Cards/MainCard.vue';
 import InfoCard from '@/components/Cards/InfoCard.vue';
 import { XMarkIcon } from '@heroicons/vue/24/solid'
+import { useAuthStore } from '@/stores/Auth';
+
+const authStore = useAuthStore()
+const isAuthenticated = computed(() => authStore.checkAuth())
 
 const cardData = ref([
   { id: 'card1', bgColor: 'bg-red-800'},
@@ -34,6 +38,7 @@ const removeCard = (index) => {
           <div class="hidden md:block lg:block col-span-1"></div>
           <div v-for="(card, index) in cardData" :key="card.id" class="relative">
             <button 
+              v-if="isAuthenticated"
               @click="() => removeCard(index)" 
               class="absolute -top-4 right-0 text-white bg-red-500 hover:bg-red-700 rounded-lg focus:outline-none"
               aria-label="Remove card"

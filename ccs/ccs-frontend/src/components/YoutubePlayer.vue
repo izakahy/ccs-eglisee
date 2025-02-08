@@ -1,19 +1,100 @@
+<template>
+  <div ref="videoContainer" class="bg-black flex flex-col justify-center items-center relative pb-11">
+    <div class="mb-0 mt-10">
+      <h3 class="text-white text-center font-bold text-4xl mb-2">{{ title }}</h3>
+    </div>
+    
+    <!-- Video Wrapper -->
+    <div class="relative w-full max-w-7xl">
+     
+      <div :class="{ 'blur-sm': showURLInput }">
+        <iframe 
+          v-if="isVideoVisible"
+          :key="currentYTURL"
+          :src="currentYTURL"
+          class="w-full h-[500px]"
+          frameborder="0"
+          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+          loading="lazy"
+          allowfullscreen
+          sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-presentation allow-top-navigation-by-user-activation"
+          @load="createPlayer"
+        ></iframe>
+
+        <div 
+          v-if="showURLInput"
+          class="absolute inset-0 z-10"
+          @click.prevent
+          @dblclick.prevent
+          @contextmenu.prevent
+        ></div>
+      </div>
+
+      <div 
+        v-if="showURLInput && isAuthenticated" 
+        class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 space-y-4"
+      >
+      <div class=" bg-gray-800/80 rounded-lg p-6 space-y-4 shadow-xl backdrop-blur-sm">
+          <div
+          v-if="showURLInput" 
+          class="flex justify-end">
+            <button
+              @click="closeInput()"
+            >
+              <XMarkIcon class="w-6 h-6 text-white hover:scale-125 transition-transform duration-200 ease-in-out" />
+            </button>
+          </div>
+          <input
+            v-model="inputURL"
+            type="text"
+            placeholder="Enter YouTube URL"
+            class="w-full p-3 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+          />
+          <button
+            @click="updateYouTubeURL"
+            class="w-full py-2 px-4 bg-red-600 hover:bg-red-800 text-white rounded transition-colors duration-200"
+          >
+            Update Video
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Button -->
+    <div class="absolute top-4 right-4 z-10">
+      <button
+        v-if="isAuthenticated && !showURLInput"
+        @click="openInput"
+        class="p-2 bg-gray-300/50 hover:bg-gray-500/50 rounded-full backdrop-blur-sm hover:scale-110 transition-all duration-200 ease-in-out"
+        aria-label="Change youtube video"
+        title="Change video"
+      >
+        <PencilSquareIcon class="w-8 h-8 text-white" />
+      </button>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/Auth';
 import { PencilSquareIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { useYTPlayerStore } from '@/stores/YoutubePlayer';
+import { storeToRefs } from 'pinia';
 
 const authStore = useAuthStore();
+const ytPlayerStore = useYTPlayerStore()
+const { ytURL } = storeToRefs(ytPlayerStore)
 
 const videoContainer = ref(null);
 const isVideoVisible = ref(false);
-const ytURL = ref(''); 
 const inputURL = ref(''); 
 const showURLInput = ref(false); 
 const isPaused = ref(false);
 let observer = null;
 let player = null;
 
+const currentYTURL = computed(() => ytURL.value)
 const isAuthenticated = computed(() => authStore.checkAuth());
 
 const props = defineProps({
@@ -21,17 +102,10 @@ const props = defineProps({
     type: String,
     default: 'LATEST SERMONS',
   },
-  ytURL: {
-    type: String,
-    default: 'https://www.youtube-nocookie.com/embed/YA2Lxfw4SSw?mute=1&loop=1&modestbranding=1&rel=0&enablejsapi=1&playlist=YA2Lxfw4SSw',
-  }
-});
-
-
-ytURL.value = props.ytURL;
-
-watch(() => props.ytURL, (newURL) => {
-  ytURL.value = newURL;
+  // ytURL: {
+  //   type: String,
+  //   default: url
+  // }
 });
 
 const extractVideoID = (url) => {
@@ -50,7 +124,13 @@ const constructEmbedURL = (videoID) => {
 const updateYouTubeURL = () => {
   const videoID = extractVideoID(inputURL.value);
   if (videoID) {
-    ytURL.value = constructEmbedURL(videoID);
+    if (player && typeof player.cueVideoById === 'function'){
+      player.cueVideoById(videoID)
+    } else {
+      const newURL = constructEmbedURL(videoID);
+      ytPlayerStore.updateURL(newURL)
+      alert("Successfully updated youtube video!")
+    }
     showURLInput.value = false
     // playVideo()
   } else {
@@ -103,13 +183,15 @@ const playVideo = () => {
 };
 
 const createPlayer = () => {
-  if (!videoContainer.value) return; // Add null check for container
+  if (!videoContainer.value) return; 
+
   const iframe = videoContainer.value.querySelector('iframe');
   
   if (iframe && window.YT && window.YT.Player) {
     // Destroy existing player first
     if (player && typeof player.destroy === 'function') {
       player.destroy();
+      player = null
     }
     
     player = new window.YT.Player(iframe, {
@@ -168,79 +250,3 @@ onUnmounted(() => {
   }, 100);
 });
 </script>
-
-<template>
-  <div ref="videoContainer" class="bg-black flex flex-col justify-center items-center relative pb-11">
-    <div class="mb-0 mt-10">
-      <h3 class="text-white text-center font-bold text-4xl mb-2">{{ title }}</h3>
-    </div>
-    
-    <!-- Video Wrapper -->
-    <div class="relative w-full max-w-7xl">
-     
-      <div :class="{ 'blur-sm': showURLInput }">
-        <iframe 
-          v-if="isVideoVisible"
-          class="w-full h-[500px]"
-          :src="ytURL"
-          frameborder="0"
-          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-          loading="lazy"
-          allowfullscreen
-          sandbox="allow-forms allow-scripts allow-same-origin allow-popups allow-presentation"
-          @load="createPlayer"
-        ></iframe>
-
-        <div 
-          v-if="isPaused"
-          class="absolute inset-0 z-10"
-          @click.prevent
-          @dblclick.prevent
-          @contextmenu.prevent
-        ></div>
-      </div>
-
-      <div 
-        v-if="showURLInput && isAuthenticated" 
-        class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6 space-y-4"
-      >
-      <div class=" bg-gray-800/80 rounded-lg p-6 space-y-4 shadow-xl backdrop-blur-sm">
-          <div
-          v-if="showURLInput" 
-          class="flex justify-end">
-            <button
-              @click="closeInput()"
-            >
-              <XMarkIcon class="w-6 h-6 text-white hover:scale-125 transition-transform duration-200 ease-in-out" />
-            </button>
-          </div>
-          <input
-            v-model="inputURL"
-            type="text"
-            placeholder="Enter YouTube URL"
-            class="w-full p-3 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
-          />
-          <button
-            @click="updateYouTubeURL"
-            class="w-full py-2 px-4 bg-red-600 hover:bg-red-800 text-white rounded transition-colors duration-200"
-          >
-            Update Video
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Edit Button -->
-    <div class="absolute top-4 right-4 z-10">
-      <button
-        v-if="isAuthenticated && !showURLInput"
-        @click="openInput"
-        class="p-2 bg-gray-300/50 hover:bg-gray-500/50 rounded-full backdrop-blur-sm hover:scale-110 transition-all duration-200 ease-in-out"
-        aria-label="Change youtube video"
-        title="Change video"
-      >
-        <PencilSquareIcon class="w-8 h-8 text-white" />
-      </button>
-    </div>
-  </div>
-</template>
