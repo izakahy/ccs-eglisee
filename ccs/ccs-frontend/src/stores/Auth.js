@@ -11,6 +11,33 @@ const api = axios.create({
     withCredentials: true,
 });
 
+let csrfPromise = null;
+
+api.interceptors.request.use(async (config) => {
+    // Only get CSRF token for mutation requests (PUT, POST, DELETE, PATCH)
+    if (['put', 'post', 'delete', 'patch'].includes(config.method)) {
+        // If we don't have an existing CSRF token
+        if (!document.cookie.includes('XSRF-TOKEN')) {
+            // Use existing promise if one is in flight
+            csrfPromise = csrfPromise || api.get('/sanctum/csrf-cookie');
+            await csrfPromise;
+            // Clear promise after it resolves
+            csrfPromise = null;
+        }
+        
+        // Get token from cookie
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1];
+
+        if (token) {
+            config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+        }
+    }
+    return config;
+});
+
 export const useAuthStore = defineStore('authStore', {
     state: () => {
         return {
@@ -94,18 +121,9 @@ export const useAuthStore = defineStore('authStore', {
         async logout() {
             try {
                 this.isLoading = true;
-                await api.get('/sanctum/csrf-cookie');
-        
-                // Add CSRF token to headers manually
-                const xsrfToken = document.cookie
-                    .split('; ')
-                    .find(row => row.startsWith('XSRF-TOKEN='))
-                    ?.split('=')[1];
-        
                 // Make logout request with both headers
                 await api.post('/api/auth/google/logout', {}, {
                     headers: {
-                        'X-XSRF-TOKEN': decodeURIComponent(xsrfToken),
                         'Authorization': `Bearer ${this.token}`
                     }
                 });

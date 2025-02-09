@@ -6,8 +6,32 @@
     
     <!-- Video Wrapper -->
     <div class="relative w-full max-w-7xl">
-     
-      <div :class="{ 'blur-sm': showURLInput }">
+      <div
+        v-if="isLoading && !showURLInput"
+        role="status" 
+        class="w-full h-[500px] bg-gray-800 animate-pulse flex flex-col items-center justify-center"
+      >
+        <div class="w-16 h-16 mb-4">
+            <svg class="animate-spin text-gray-500 w-full h-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+        <div class="sr-only">Loading video...</div>
+      </div>
+
+      <div
+        v-else-if="ytURL === '' && !showURLInput"
+        role="status" 
+        class="w-full h-[500px] bg-gray-950 animate-pulse flex flex-col items-center justify-center"
+      >
+        <div class="">
+            <p class="text-white text-md">Video not found.</p>
+        </div>
+        <div class="sr-only">Loading video...</div>
+      </div>
+
+      <div v-else :class="{ 'blur-sm': showURLInput }">
         <iframe 
           v-if="isVideoVisible"
           :key="currentYTURL"
@@ -36,11 +60,10 @@
       >
       <div class=" bg-gray-800/80 rounded-lg p-6 space-y-4 shadow-xl backdrop-blur-sm">
           <div
-          v-if="showURLInput" 
-          class="flex justify-end">
-            <button
-              @click="closeInput()"
-            >
+            v-if="showURLInput" 
+            class="flex justify-end"
+          >
+            <button @click="closeInput()">
               <XMarkIcon class="w-6 h-6 text-white hover:scale-125 transition-transform duration-200 ease-in-out" />
             </button>
           </div>
@@ -49,12 +72,21 @@
             type="text"
             placeholder="Enter YouTube URL"
             class="w-full p-3 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+            :disabled="isLoading"
           />
           <button
             @click="updateYouTubeURL"
             class="w-full py-2 px-4 bg-red-600 hover:bg-red-800 text-white rounded transition-colors duration-200"
+            :disabled="isLoading"
           >
-            Update Video
+            <span v-if="!isLoading">Update Video</span>
+            <div v-else class="flex items-center justify-center">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span class="ml-2">Updating...</span>
+            </div>
           </button>
         </div>
       </div>
@@ -84,7 +116,7 @@ import { storeToRefs } from 'pinia';
 
 const authStore = useAuthStore();
 const ytPlayerStore = useYTPlayerStore()
-const { ytURL } = storeToRefs(ytPlayerStore)
+const { ytURL, isLoading } = storeToRefs(ytPlayerStore)
 
 const videoContainer = ref(null);
 const isVideoVisible = ref(false);
@@ -121,22 +153,22 @@ const constructEmbedURL = (videoID) => {
   return `${baseURL}${videoID}?${settings}${playlistParam}`;
 };
 
-const updateYouTubeURL = () => {
-  const videoID = extractVideoID(inputURL.value);
-  if (videoID) {
-    if (player && typeof player.cueVideoById === 'function'){
-      player.cueVideoById(videoID)
+const updateYouTubeURL = async () => {
+    const videoID = extractVideoID(inputURL.value);
+    if (videoID) {
+        await ytPlayerStore.updateURL(1, inputURL.value);  // Pass ID (1 in this case) and URL
+        if (ytPlayerStore.errors.length === 0) {
+            showURLInput.value = false;
+            if (player && typeof player.cueVideoById === 'function') {
+                player.cueVideoById(videoID);
+            }
+        } else {
+            alert(ytPlayerStore.errors.message);
+        }
     } else {
-      const newURL = constructEmbedURL(videoID);
-      ytPlayerStore.updateURL(newURL)
-      alert("Successfully updated youtube video!")
+        alert('Invalid YouTube URL. Please provide a valid YouTube video link.');
+        showURLInput.value = true;
     }
-    showURLInput.value = false
-    // playVideo()
-  } else {
-    alert('Invalid YouTube URL. Please provide a valid YouTube video link.');
-    showURLInput.value = true
-  }
 };
 
 const openInput = () => {
@@ -213,8 +245,9 @@ const onPlayerStateChange = (event) => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
   loadYoutubeAPI();
+  await ytPlayerStore.getYTURL(1)
   
   if (videoContainer.value) {
     observer = new IntersectionObserver((entries) => {
