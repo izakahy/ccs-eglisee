@@ -1,5 +1,6 @@
 @uri = http://localhost:8000/api
 @logoutUri = http://localhost:8000/auth/google
+@accessKey = 139|ST96Ut5BExVjVljpPUff5ewjvBipiCMiNgnbvmxS3e710c7c
 
 ### 
 GET {{ uri }}/posts
@@ -51,7 +52,7 @@ Accept: application/json
 
 ### Test posts endpoint
 GET {{ uri }}/posts
-Authorization: Bearer 42|ahN52jEdp71mFehY6gJYqFwlGt6RBm1z0OLPsye357c42d97
+Authorization: Bearer 87|IrrTBgNMi2mdysksPVypj2A3QT4Ob5t9XNWL7NP4a32e32c8
 Accept: application/json
 
 
@@ -59,3 +60,72 @@ Accept: application/json
 POST {{ uri }}/auth/google/logout 
 Authorization: Bearer 77|VGUQjJHcohtFqyCiRaPQiSIR7tGGRc593ufn03Vs796cc01f
 Accept: application/json
+
+### Test new yt_url creation
+POST {{ uri }}/yt-urls
+Authorization: Bearer 137|3tiXVKNPnx0hUL6o0aGy9Df4isHv6RnjRgqAgNPwf95c077e
+Content-Type: application/json
+Accept: application/json
+
+{
+    "yt_url" : "https://www.youtube.com/watch?v=ozkg_iW9mNU"
+}
+
+### Test getting that url 
+GET  {{ uri }}/yt-urls
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+### Test getting that specific url 
+GET  {{ uri }}/yt-urls/2
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+
+### Test new yt_url update
+PUT {{ uri }}/yt-urls/1
+Authorization: Bearer 139|ST96Ut5BExVjVljpPUff5ewjvBipiCMiNgnbvmxS3e710c7c
+Content-Type: application/json
+Accept: application/json
+
+{
+    "yt_url" : "https://youtu.be/YA2Lxfw4SSw?list=TLGGABOYhUzoLlkwOTAyMjAyNQ"
+}
+
+### Test creating content body
+POST {{uri}}/contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title" : "title Test4",
+    "body" : "This is the body test 2"
+}
+
+
+### Test getting all content
+GET {{uri}}/contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+
+### Test getting a specific content
+GET {{uri}}/contents/1
+Content-Type: application/json
+Accept: application/json
+
+
+### Test content update
+PUT {{uri}}/contents/1
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title" : "This is the updated title",
+    "body" : "This is the updated body"
+}

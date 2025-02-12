@@ -1,29 +1,41 @@
 import { defineStore } from "pinia"
-import router from "@/router";
+import { api } from "./Auth";
+import router  from "@/router";
 
 export const usePostsStore = defineStore('postsStore', {
     state: () => {
         return {
             errors: {},
-            message: null
+            message: null,
+            isLoading: false,
+            posts: [],
         }
     },
     actions: {
         // Get all posts
         async getPosts() {
-            const res = await fetch('/api/posts');
-            const data = await res.json();
-
-            console.log(data);
-            return data;
+            try {
+                this.isLoading = true;
+                const res = await api.get('/api/posts');
+                
+                this.posts = res.data;
+            } catch (error) {
+                this.errors = error.response?.data || { message: "Failed to fetch posts" };
+            } finally {
+                this.isLoading = false;
+            }
         },
         // Gett a posts
         async getPost(post) {
-            const res = await fetch(`/api/posts/${post}`);
+           try {
+             const res = await fetch(`/api/posts/${post}`);
             const data = await res.json();
 
             console.log(data);
             return data.post;
+           } catch (error) {
+            
+           }
         },
         // Create a post
         async createPost(fromData) {

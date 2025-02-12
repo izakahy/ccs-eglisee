@@ -2,12 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* Base editor styles */
+  .editor-content {
+    @apply whitespace-pre-wrap; /* Preserve spaces and line breaks */
+  }
+
+  /* Headings */
+  .editor-content h1, .prose-preview h1 {
+    @apply text-3xl font-bold mb-4 mt-6;
+  }
+  .editor-content h2, .prose-preview h2 {
+    @apply text-2xl font-bold mb-3 mt-5;
+  }
+  .editor-content h3, .prose-preview h3 {
+    @apply text-xl font-bold mb-2 mt-4;
+  }
+
+  /* Lists - Editor & Preview */
+  .editor-content ul,
+  .editor-content ol,
+  .prose-preview ul,
+  .prose-preview ol {
+    @apply my-3 pl-6 list-outside;
+    margin-left: 0;
+  }
+
+  .editor-content ul,
+  .prose-preview ul {
+    @apply list-disc;
+  }
+
+  .editor-content ol,
+  .prose-preview ol {
+    @apply list-decimal;
+  }
+
+  .editor-content li,
+  .prose-preview li {
+    @apply mb-1.5 leading-relaxed;
+  }
+
+  /* Nested lists */
+  .editor-content ul ul,
+  .editor-content ol ul,
+  .prose-preview ul ul,
+  .prose-preview ol ul {
+    @apply pl-6 mt-1;
+    list-style-type: circle;
+  }
+
+  .editor-content ol ol,
+  .editor-content ul ol,
+  .prose-preview ol ol,
+  .prose-preview ul ol {
+    @apply pl-6 mt-1;
+    list-style-type: lower-roman;
+  }
+
+  /* Paragraph spacing */
+  .editor-content p,
+  .prose-preview p {
+    @apply my-3 leading-relaxed;
+  }
+
+  /* Preserve spaces in text */
+  .editor-content pre,
+  .prose-preview pre {
+    @apply whitespace-pre-wrap;
+  }
+
+
+  .tiptap-content {
+    .paragraph-node {
+      @apply mb-3 text-gray-800;
+    }
+    
+    .heading-node {
+      @apply font-bold text-gray-900;
+      &.h1 { @apply text-2xl mb-4; }
+      &.h2 { @apply text-xl mb-3; }
+      &.h3 { @apply text-lg mb-2; }
+    }
+  
+    .highlight-node {
+      @apply bg-yellow-200 px-1;
+    }
+  
+    ul, ol {
+      @apply pl-6 my-2;
+      li {
+        @apply mb-1;
+      }
+    }
+  
+  }
+}
+
+
+
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
 html {
     @apply scroll-smooth;
 }
 
 .hero-text {
-    @apply text-center font-bold text-6xl sm:text-7xl md:text-8xl lg:text-8xl text-white transition-all duration-500 ease-in-out;
+    @apply text-center font-extrabold text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-white transition-all duration-500 ease-in-out;
 }
 .h-about-pastor {
     @apply text-4xl sm:text-4xl md:text-6xl lg:text-7xl font-medium text-center sm:text-center md:text-start lg:text-start transition-all duration-500 ease-in-out;
@@ -16,5 +122,21 @@ html {
     @apply absolute bottom-0 left-0 w-0 h-1 bg-white transition-all duration-300 ease-out group-hover:w-full group-active:bg-purple-500;
 }
 .pop-up-a {
-    @apply transform transition duration-300 ease-in-out group-active:scale-105 group-active:-translate-y-1;
+    @apply transform transition duration-300 hover:scale-105 group-active:scale-105 group-active:-translate-y-1 ease-in-out ;
+}
+
+.btn-primary {
+  @apply text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium text-lg px-5 py-4 me-2 w-5/12 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700;
+}
+
+.btn-secondary {
+  @apply bg-gray-800 text-white text-lg px-8 py-3 rounded-full shadow-lg hover:bg-gray-900 hover:shadow-xl transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-500
+}
+
+.text-shadow {
+  text-shadow: -1px 12px 14px rgb(13 7 7 / 90%);
+}
+
+#about {
+  @apply scroll-smooth
 }

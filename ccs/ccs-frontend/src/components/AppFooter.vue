@@ -6,6 +6,10 @@ import { useAuthStore } from '@/stores/Auth';
 const authStore = useAuthStore();
 
 const handleLogin = () => {
+  if (authStore.checkAuth()) {
+    alert("You are already logged in")
+    return
+  }
   authStore.googleLogin();
 }
 </script>

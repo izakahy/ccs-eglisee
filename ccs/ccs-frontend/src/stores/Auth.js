@@ -11,6 +11,33 @@ const api = axios.create({
     withCredentials: true,
 });
 
+let csrfPromise = null;
+
+api.interceptors.request.use(async (config) => {
+    // Only get CSRF token for mutation requests (PUT, POST, DELETE, PATCH)
+    if (['put', 'post', 'delete', 'patch'].includes(config.method)) {
+        // If we don't have an existing CSRF token
+        if (!document.cookie.includes('XSRF-TOKEN')) {
+            // Use existing promise if one is in flight
+            csrfPromise = csrfPromise || api.get('/sanctum/csrf-cookie');
+            await csrfPromise;
+            // Clear promise after it resolves
+            csrfPromise = null;
+        }
+        
+        // Get token from cookie
+        const token = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1];
+
+        if (token) {
+            config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+        }
+    }
+    return config;
+});
+
 export const useAuthStore = defineStore('authStore', {
     state: () => {
         return {
@@ -20,6 +47,9 @@ export const useAuthStore = defineStore('authStore', {
             message: null,
             isAuthenticated: false,
             isLoading: false,
+            isLoggedIn: false,
+            alertMsg: null,
+            alertType: 'error'
         }
     },
     actions: {
@@ -38,10 +68,20 @@ export const useAuthStore = defineStore('authStore', {
             }
         },
 
-     
         async handleCallBack() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
+                
+                if (urlParams.has('error')) {
+                    const errMsg = urlParams.get('error');
+                    this.showAlert(decodeURIComponent(errMsg), 'error');
+                    
+                    setTimeout(() => {
+                        router.push({ name: 'home' });
+                    }, 1300)
+                    return;
+                }
+
                 const token = urlParams.get('token');
                 const userEncoded = urlParams.get('user');
         
@@ -60,18 +100,17 @@ export const useAuthStore = defineStore('authStore', {
         
                     // Set default axios header
                     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
-                    // Redirect to home
+
+                    this.showAlert('Successfully logged in!', 'success');
                     router.push({ name: 'home' });
-                }
-        
-                // Handle errors
-                if (urlParams.has('error')) {
-                    this.errors = { auth: urlParams.get('error') };
                 }
             } catch (error) {
                 this.errors = { auth: 'Failed to process login response' };
-                console.error('Callback error:', error);
+                this.showAlert('Failed to process login response. Please try again.', 'error');
+
+                setTimeout(() => {
+                    router.push({ name: 'home' })
+                }, 1300)
             }
         },
         // Start google login
@@ -79,22 +118,12 @@ export const useAuthStore = defineStore('authStore', {
             window.location.href = 'http://localhost:8000/auth/google/redirect';
         },
        
-       
         async logout() {
             try {
                 this.isLoading = true;
-                await api.get('/sanctum/csrf-cookie');
-        
-                // Add CSRF token to headers manually
-                const xsrfToken = document.cookie
-                    .split('; ')
-                    .find(row => row.startsWith('XSRF-TOKEN='))
-                    ?.split('=')[1];
-        
                 // Make logout request with both headers
                 await api.post('/api/auth/google/logout', {}, {
                     headers: {
-                        'X-XSRF-TOKEN': decodeURIComponent(xsrfToken),
                         'Authorization': `Bearer ${this.token}`
                     }
                 });
@@ -108,6 +137,7 @@ export const useAuthStore = defineStore('authStore', {
                 delete api.defaults.headers.common['Authorization'];
         
                 this.message = "Successfully logged out!";
+                this.showAlert('Successfully logged out!', 'success');
                 router.push({ name: 'home' });
         
             } catch (error) {
@@ -152,7 +182,17 @@ export const useAuthStore = defineStore('authStore', {
 
         // Helper to check if user is authenticated
         checkAuth() {
-            return this.isAuthenticated && this.token;
+            return this.isAuthenticated && Boolean(this.token);
+        },
+
+        showAlert(msg, type = 'error') {
+            this.alertMsg = msg;
+            this.alertType = type;
+
+            setTimeout(() =>{
+                this.alertMsg = null
+                this.alertType = null
+            }, 1300)
         }
     }
 });
