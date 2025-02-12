@@ -106,7 +106,7 @@
     </template>
     
     <li><a target="_blank" href="https://www.youtube.com/@CommunauteCompassionShediac">WATCH</a></li>
-    <li><RouterLink :to="{ name: 'create' }">FORWARD</RouterLink></li>
+    <li><RouterLink :to="{ name: 'create' }">GALLERY</RouterLink></li>
     <li><RouterLink :to="{ name: 'create' }">GIVE</RouterLink></li>
   
     <!-- Add Section Form -->

@@ -10,6 +10,7 @@
                       type="text"
                       class="w-full p-2 border rounded mb-4"
                       maxlength="50"
+                      :disabled="isLoading"
                     />
                     <div 
                       class="absolute right-2 top-2 text-sm flex items-center gap-2"
@@ -171,8 +172,9 @@
                     <button
                       @click="saveEdit"
                       class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                      :disabled="editor?.storage.characterCount.characters() > 2000"
+                      :disabled="isLoading || editor?.storage.characterCount.characters() > 2000"
                     >
+                    <span v-if="isLoading" class="inline-block animate-spin">⌛</span>
                         Save
                     </button>
                   </div>
@@ -191,7 +193,11 @@
     modelValue: Boolean,
     editType: String,
     titleValue: String,
-    bodyValue: String
+    bodyValue: String,
+    isLoading: {
+      type: Boolean,
+      default: false
+    }
   })
 
   const emit = defineEmits(['update:modelValue', 'update:title', 'update:body'])
@@ -296,6 +302,10 @@
     }
   })
 
+  watch(() => props.titleValue, (newValue) => {
+    localTitle.value = newValue
+  })
+
   watch(() => props.bodyValue, (newContent) => {
     if (props.editType === 'body' && editor.value?.isEditable && newContent !== editor.value.getHTML()) {
       editor.value.commands.setContent(newContent)
@@ -310,6 +320,7 @@
   }
 
   const saveEdit = () => {
+    if (props.isLoading) return
     try {
       if (props.editType === 'title') {
         emit('update:title', localTitle.value)

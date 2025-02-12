@@ -1,35 +1,61 @@
 <template>
-  <div>
-    <div :class="[bgColor, 'p-6 min-h-[320px] max-h-[420px] rounded-md flex flex-col']">
+  <div class="h-full">
+    <div :class="[bgColor, 'p-6 h-[420px] rounded-md flex flex-col']">
       
       <div class="flex-grow overflow-hidden flex flex-col">
         
         <h1 class="font-bold text-3xl mb-4 relative flex items-center justify-between">
-          <span class="truncate">{{ cardData.title }}</span>
-          <button
-            v-if="isAuthenticated"
-            @click="openEdit('title')"
-            class="flex-shrink-0 ml-2 text-white bg-orange-500 p-1 hover:bg-orange-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-            aria-label="Edit title"
-            title="Edit title"
-          >
-            <PencilSquareIcon class="h-6 w-6" />
-          </button>
+          <template v-if="isLoading">
+            <div class="h-8 bg-gray-300 rounded-full w-3/4 animate-pulse"></div>
+            <div class="h-8 w-8 bg-gray-300 rounded-lg animate-pulse"></div>
+          </template>
+          <template v-else>
+            <span class="truncate">{{ cardData.title }}</span>
+            <button
+              v-if="isAuthenticated"
+              @click="openEdit('title')"
+              class="flex-shrink-0 ml-2 text-white bg-orange-500 p-1 hover:bg-orange-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Edit title"
+              title="Edit title"
+            >
+              <PencilSquareIcon class="h-6 w-6" />
+            </button>
+          </template>
         </h1>
 
         <div class="relative flex-grow overflow-hidden">
-          <div class="prose prose-preview overflow-y-auto">
-            <div v-html="shortenBody.text" class="h-full"></div>
+          <div class="prose prose-preview">
+            <template v-if="isLoading">
+              <!-- Skeleton for body text -->
+              <div class="space-y-2 my-10">
+                <div class="h-4 bg-gray-300 rounded-full w-full animate-pulse"></div>
+                <div class="h-4 bg-gray-300 rounded-full w-5/6 animate-pulse"></div>
+                <div class="h-4 bg-gray-300 rounded-full w-full animate-pulse"></div>
+                <div class="h-4 bg-gray-300 rounded-full w-full animate-pulse"></div>
+                <div class="h-4 bg-gray-300 rounded-full w-5/6 animate-pulse"></div>
+                <div class="h-4 bg-gray-300 rounded-full w-4/6 animate-pulse"></div>
+              </div>
+            </template>
+            <div v-else v-html="shortenBody.text" class="h-full break-words"></div>
           </div>
-          <div
-          v-if="shortenBody.truncated" 
-          class="flex justify-center mt-4">
-            <button class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
+          
+          <div class="flex justify-center mt-4">
+            <template v-if="isLoading">
+              <!-- Skeleton for "Learn more" button -->
+              <div class="h-10 w-28 bg-gray-300 rounded-lg animate-pulse"></div>
+            </template>
+            <a v-else-if="shortenBody.truncated" 
+              class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
               Learn more
-            </button>
+            </a>
           </div>
+          
+          <template v-if="isLoading">
+            <!-- Skeleton for edit button -->
+            <div class="absolute bottom-2 right-2 h-8 w-8 bg-gray-300 rounded-lg animate-pulse"></div>
+          </template>
           <button
-            v-if="isAuthenticated"
+            v-else-if="isAuthenticated"
             @click="openEdit('body')"
             class="absolute bottom-2 right-2 text-white bg-orange-500 p-1 hover:bg-orange-600 rounded-lg transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
             aria-label="Edit body"
@@ -46,6 +72,7 @@
       :edit-type="editType"
       :title-value="cardData.title"
       :body-value="cardData.body"
+      :is-loading="isLoading"
       @update:title="updateTitle"
       @update:body="updateBody"
     />
@@ -53,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/Auth'
 import EditorDialog from '../Helper/EditorDialog.vue'
@@ -74,7 +101,28 @@ const authStore = useAuthStore()
 const contentStore = useContentStore()
 
 const isAuthenticated = computed(() => authStore.checkAuth())
-const cardData = computed(() => contentStore.cards[props.id])
+const isLoading = computed(() => contentStore.isLoading)
+
+const storeState = computed(() => ({
+  cards: contentStore.cards,
+  allContent: contentStore.allContent,
+  isLoading: contentStore.isLoading,
+  errors: contentStore.errors
+}))
+
+watch(storeState, (newState) => {
+  console.log('STORE State updated', {
+    cards: newState.cards,
+    allContent: newState.allContent,
+    isLoading: newState.isLoading,
+    errors: newState.errors
+  })
+}, {deep: true})
+
+const cardData = computed(() => {
+  const card = contentStore.cards[props.id]
+  return card || { title: '', body: '' }
+})
 
 const showDialog = ref(false)
 const editType = ref('')
@@ -92,16 +140,27 @@ const shortenBody = computed(() => {
 })
 
 const openEdit = (type) => {
+  if (!cardData.value?.title || !cardData.value?.body) return
   editType.value = type
   showDialog.value = true
 }
 
-const updateTitle = (newTitle) => {
-  contentStore.updateTitle(props.id, newTitle)
+const updateTitle = async (newTitle) => {
+  try {
+    await contentStore.updateTitle(props.id, newTitle)
+    showDialog.value = false
+  } catch (error) {
+    alert("ERORR: " + error)
+  }
 }
 
-const updateBody = (newBody) => {
-  contentStore.updateBody(props.id, newBody)
+const updateBody = async (newBody) => {
+  try {
+    await contentStore.updateBody(props.id, newBody)
+    showDialog.value = false
+  } catch (error) {
+    alert("ERORR: " + error)
+  }
 }
 
 watch(showDialog, (newVal) => {
@@ -111,27 +170,16 @@ watch(showDialog, (newVal) => {
     }, 100)
   }
 })
+
+onMounted(async () => {
+  try {
+    await contentStore.getContent()
+  } catch (error) {
+    console.error('Error fetching content:', error)
+  }
+})
 </script>
 
 <style scoped>
-.prose-preview {
-  /* Improved scroll handling */
-  scrollbar-width: thin;
-  scrollbar-color: #4a5568 transparent;
-}
-
-/* Custom scrollbar for Webkit browsers */
-.prose-preview::-webkit-scrollbar {
-  width: 6px;
-}
-
-.prose-preview::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.prose-preview::-webkit-scrollbar-thumb {
-  background-color: #4a5568;
-  border-radius: 3px;
-}
 
 </style>

@@ -34,9 +34,12 @@ const removeCard = (index) => {
     <div class="p-5 py-16 px-4 sm:px-6 lg:px-8">
       <InfoCard />
       <div class="mt-11 mb-11">
-        <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto_1fr] lg:grid-cols-[1fr_auto_auto_auto_1fr] gap-11 mx-auto max-w-6xl">
-          <div class="hidden md:block lg:block col-span-1"></div>
-          <div v-for="(card, index) in cardData" :key="card.id" class="relative">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-11 mx-auto max-w-6xl">
+          <div 
+            v-for="(card, index) in cardData"
+            :key="card.id"
+            class="relative h-full"
+          >
             <button 
               v-if="isAuthenticated"
               @click="() => removeCard(index)" 
@@ -46,9 +49,8 @@ const removeCard = (index) => {
             >
               <XMarkIcon class="h-8 w-8" />
             </button>
-            <HeroCard :id="card.id" :bgColor="card.bgColor" />
+            <HeroCard :id="card.id" :bgColor="card.bgColor" class="h-full" />
           </div>
-          <div class="hidden md:block lg:block col-span-1"></div>
         </div>
       </div>
     </div>

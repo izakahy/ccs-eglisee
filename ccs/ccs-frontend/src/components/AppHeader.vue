@@ -80,7 +80,7 @@ watch(isMenuOpen, (newValue) => {
             :about-items="aboutItems" 
           />
         </div>
-
+        
         <!-- Mobile Navigation -->
         <Mobile 
           :is-menu-open="isMenuOpen"

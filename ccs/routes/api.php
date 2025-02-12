@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\YTPlayerController;
@@ -17,6 +18,7 @@ Route::prefix('auth')->group(function () {
 
 // Public routes
 Route::get('yt-urls/{yTPlayer}', [YTPlayerController::class, 'show']);
+Route::get('contents/{content}', [ContentController::class, 'show']);
 
 // User routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -33,4 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('yt-urls', YTPlayerController::class)
         ->parameters(['yt-urls' => 'yTPlayer'])
         ->except(['show']);
+    Route::apiResource('contents', ContentController::class)
+        ->except('show');
 });

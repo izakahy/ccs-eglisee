@@ -1,5 +1,6 @@
 @uri = http://localhost:8000/api
 @logoutUri = http://localhost:8000/auth/google
+@accessKey = 139|ST96Ut5BExVjVljpPUff5ewjvBipiCMiNgnbvmxS3e710c7c
 
 ### 
 GET {{ uri }}/posts
@@ -72,13 +73,13 @@ Accept: application/json
 
 ### Test getting that url 
 GET  {{ uri }}/yt-urls
-Authorization: Bearer 137|3tiXVKNPnx0hUL6o0aGy9Df4isHv6RnjRgqAgNPwf95c077e
+Authorization: Bearer {{accessKey}}
 Content-Type: application/json
 Accept: application/json
 
 ### Test getting that specific url 
 GET  {{ uri }}/yt-urls/2
-Authorization: Bearer 139|ST96Ut5BExVjVljpPUff5ewjvBipiCMiNgnbvmxS3e710c7c
+Authorization: Bearer {{accessKey}}
 Content-Type: application/json
 Accept: application/json
 
@@ -91,4 +92,40 @@ Accept: application/json
 
 {
     "yt_url" : "https://youtu.be/YA2Lxfw4SSw?list=TLGGABOYhUzoLlkwOTAyMjAyNQ"
+}
+
+### Test creating content body
+POST {{uri}}/contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title" : "title Test4",
+    "body" : "This is the body test 2"
+}
+
+
+### Test getting all content
+GET {{uri}}/contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+
+### Test getting a specific content
+GET {{uri}}/contents/1
+Content-Type: application/json
+Accept: application/json
+
+
+### Test content update
+PUT {{uri}}/contents/1
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "title" : "This is the updated title",
+    "body" : "This is the updated body"
 }
