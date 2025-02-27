@@ -1,6 +1,6 @@
-@uri = http://localhost:8000/api
+@uri = http://localhost/api
 @logoutUri = http://localhost:8000/auth/google
-@accessKey = 139|ST96Ut5BExVjVljpPUff5ewjvBipiCMiNgnbvmxS3e710c7c
+@accessKey = 2|5wxR1YVpU15lAt2JI4bYXV4wXjZufGSHdnuOQQb8a583bfcb
 
 ### 
 GET {{ uri }}/posts
@@ -101,8 +101,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "title" : "title Test4",
-    "body" : "This is the body test 2"
+    "title" : "title9",
+    "body" : "body9"
 }
 
 

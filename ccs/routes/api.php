@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\NavItemController;
+use App\Http\Controllers\NavSectionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\YTPlayerController;
 use Illuminate\Http\Request;
@@ -19,6 +21,9 @@ Route::prefix('auth')->group(function () {
 // Public routes
 Route::get('yt-urls/{yTPlayer}', [YTPlayerController::class, 'show']);
 Route::get('contents/{content}', [ContentController::class, 'show']);
+Route::get('sections/{section}', [NavSectionController::class, 'show']);
+Route::get('sections', [NavSectionController::class, 'index']);
+Route::get('items', [NavItemController::class, 'show']);
 
 // User routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -37,4 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
         ->except(['show']);
     Route::apiResource('contents', ContentController::class)
         ->except('show');
+    Route::apiResource('sections', NavSectionController::class)
+        ->except('index','show');
+    Route::apiResource('items', NavItemController::class)
+        ->except('index', 'show');
 });
