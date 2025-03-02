@@ -1,6 +1,6 @@
 <template>
     <button
-      class="md:hidden relative w-10 h-10 text-white focus:outline-none"
+      class="lg:hidden relative w-10 h-10 text-white focus:outline-none"
       @click="$emit('toggle')"
       aria-label="Toggle menu"
     >

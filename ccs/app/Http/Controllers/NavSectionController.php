@@ -18,10 +18,12 @@ class NavSectionController extends Controller
         $formatted = $sections->mapWithKeys(function ($section) {
             return [
                 $section->key => [
+                    'id' => $section->id,
                     'path' => '/' . $section->key,
                     'label' => $section->label,
                     'items' => $section->items->map(function ($item) use ($section) {
                         return [
+                            'id' => $item->id,
                             'label' => $item->label,
                             'path' => '/' . $section->key . '/' . ltrim($item->path, '/')
                         ];

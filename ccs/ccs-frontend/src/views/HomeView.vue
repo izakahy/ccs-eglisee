@@ -12,9 +12,9 @@ const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.checkAuth())
 
 const cardData = ref([
-  { id: 'card1', bgColor: 'bg-red-800'},
-  { id: 'card2', bgColor: 'bg-blue-500'},
-  { id: 'card3', bgColor: 'bg-green-500'},
+  { id: 'card1', bgColor: 'bg-[#2f9260]'},
+  { id: 'card2', bgColor: 'bg-[#2f9260]'},
+  { id: 'card3', bgColor: 'bg-[#2f9260]'},
 ])
 
 const removeCard = (index) => {
@@ -27,7 +27,6 @@ const removeCard = (index) => {
 </script>
 
 <template>
-  <main>
     <!-- hero -->
    <MainCard image="https://images3.alphacoders.com/110/1109183.jpg" />
 
@@ -113,5 +112,4 @@ const removeCard = (index) => {
         </InvitationCard>
       </div>
     </div>
-  </main>
 </template>

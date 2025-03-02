@@ -111,12 +111,12 @@ const storeState = computed(() => ({
 }))
 
 watch(storeState, (newState) => {
-  console.log('STORE State updated', {
-    cards: newState.cards,
-    allContent: newState.allContent,
-    isLoading: newState.isLoading,
-    errors: newState.errors
-  })
+  // console.log('STORE State updated', {
+  //   cards: newState.cards,
+  //   allContent: newState.allContent,
+  //   isLoading: newState.isLoading,
+  //   errors: newState.errors
+  // })
 }, {deep: true})
 
 const cardData = computed(() => {

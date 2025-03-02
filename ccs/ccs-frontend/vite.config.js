@@ -4,6 +4,10 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+
+const isArtisan = process.argv.includes('--artisan'); // Toggle via CLI flag
+const apiTarget = isArtisan ? 'http://127.0.0.1:8000' : 'http://localhost';
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -18,7 +22,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api' : {
-        target: 'http://127.0.0.1:8000',
+        target: apiTarget,
         changeOrigin: true,
         headers: {
           Accept: 'application/json',

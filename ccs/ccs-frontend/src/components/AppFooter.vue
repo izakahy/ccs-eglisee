@@ -15,7 +15,7 @@ const handleLogin = () => {
 </script>
 
 <template>
-  <footer class="bg-black w-full p-8 text-gray-100">
+  <footer class="nav-gradient w-full p-8 text-gray-100">
     <div class="max-w-screen-xl mx-auto grid grid-rows-1 md:grid-rows-2 lg:grid-rows-4 gap-6">
       <div class="flex items-center space-x-3">
         <PhoneIcon class="h-5 w-5" />
@@ -50,3 +50,53 @@ const handleLogin = () => {
     </div>
   </footer>
 </template>
+
+<style scoped>
+.nav-gradient {
+  position: sticky;
+  top: -1px; /* Fixes 1px gap at top */
+  background-color: #021a21; /* Base dark color */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: height, padding;
+}
+
+.nav-gradient::before,
+.nav-gradient::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+
+.nav-gradient::before {
+  z-index: -1;
+  background: 
+    linear-gradient(
+      45deg,
+      rgba(3, 62, 63, 0.4) 0%,
+      rgba(4, 78, 75, 0.4) 50%,
+      rgba(2, 26, 33, 0.4) 100%
+    ),
+    radial-gradient(
+      600px circle at 70% 50%,
+      rgba(4, 78, 75, 0.5) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      500px circle at 30% 50%,
+      rgba(3, 62, 63, 0.5) 0%,
+      transparent 70%
+    );
+}
+
+/* Add a subtle noise texture overlay */
+.nav-gradient::after {
+  background: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/%3E%3C/svg%3E');
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+}
+</style>

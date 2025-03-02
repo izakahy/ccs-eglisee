@@ -3,7 +3,7 @@ import axios from "axios";
 import  router from "@/router";
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: '',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -14,27 +14,39 @@ const api = axios.create({
 let csrfPromise = null;
 
 api.interceptors.request.use(async (config) => {
-    // Only get CSRF token for mutation requests (PUT, POST, DELETE, PATCH)
-    if (['put', 'post', 'delete', 'patch'].includes(config.method)) {
-        // If we don't have an existing CSRF token
-        if (!document.cookie.includes('XSRF-TOKEN')) {
-            // Use existing promise if one is in flight
-            csrfPromise = csrfPromise || api.get('/sanctum/csrf-cookie');
-            await csrfPromise;
-            // Clear promise after it resolves
-            csrfPromise = null;
-        }
-        
-        // Get token from cookie
-        const token = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('XSRF-TOKEN='))
-            ?.split('=')[1];
-
+    // For API routes that need token auth
+    if (config.url.startsWith('/api')) {
+        const token = localStorage.getItem('token');
         if (token) {
-            config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        return config;
+    }
+
+    // For non-API mutation requests
+    if (['put', 'post', 'delete', 'patch'].includes(config.method?.toLowerCase())) {
+        try {
+            // Get fresh CSRF token if needed
+            if (!document.cookie.includes('XSRF-TOKEN')) {
+                csrfPromise = csrfPromise || api.get('/sanctum/csrf-cookie');
+                await csrfPromise;
+                csrfPromise = null;
+            }
+
+            // Get and set CSRF token
+            const token = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('XSRF-TOKEN='))
+                ?.split('=')[1];
+
+            if (token) {
+                config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+            }
+        } catch (error) {
+            console.error('CSRF token fetch error:', error);
         }
     }
+
     return config;
 });
 
@@ -115,70 +127,39 @@ export const useAuthStore = defineStore('authStore', {
         },
         // Start google login
         async googleLogin() {
-            window.location.href = 'http://localhost:8000/auth/google/redirect';
+            window.location.href = '/api/auth/google/redirect';
         },
        
         async logout() {
             try {
                 this.isLoading = true;
-                // Make logout request with both headers
+                
+                // Make logout request
                 await api.post('/api/auth/google/logout', {}, {
                     headers: {
-                        'Authorization': `Bearer ${this.token}`
+                        'Authorization': `Bearer ${this.token}`,
                     }
                 });
-                
-                // Clear local state
+              
+                // Clear state
                 this.user = null;
                 this.token = null;
                 this.isAuthenticated = false;
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 delete api.defaults.headers.common['Authorization'];
-        
-                this.message = "Successfully logged out!";
+                
                 this.showAlert('Successfully logged out!', 'success');
                 router.push({ name: 'home' });
-        
             } catch (error) {
                 console.error("Logout error:", error.response?.data || error);
-                this.errors = { 
-                    auth: error.response?.data?.message || 'Failed to logout' 
-                };
+                this.errors = { auth: error.response?.data?.message || 'Failed to logout' };
+                this.showAlert('Failed to logout. Please try again.', 'error');
             } finally {
                 this.isLoading = false;
             }
         },
 
-        // async logout() {
-        //     try {
-        //         const res = await fetch('http://localhost:8000/api/auth/google/logout', { 
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //                 'Authorization': `Bearer ${this.token}`,
-        //                 'Accept': 'application/json',
-        //             },
-        //         });
-    
-        //         const data = await res.json(); 
-    
-        //         if (res.ok) {
-        //             // Clear user data
-        //             this.user = null;
-        //             this.token = null;
-        //             this.isAuthenticated = false;
-        //             localStorage.removeItem('token');
-        //             localStorage.removeItem('user');
-        //             this.message = "Successfully logged out!";
-        //             router.push({ name: 'home' });
-        //         } else {
-        //             this.errors = { auth: data.message || 'Failed to logout' };
-        //         }
-        //     } catch (error) {
-        //         this.errors = { auth: 'Failed to logout' };
-        //     }
-        // },
 
         // Helper to check if user is authenticated
         checkAuth() {

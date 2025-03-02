@@ -27,47 +27,105 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNavigationStore } from '@/stores/NavItems/Navigation';
 import NotFoundView from '@/views/NotFoundView.vue';
 
-const route = useRoute()
-const router = useRouter()
-const navStore = useNavigationStore()
-
+const route = useRoute();
+const router = useRouter();
+const navStore = useNavigationStore();
+const loading = ref(true);
 const isNavigating = ref(false);
-
-const currentSection = computed(() => {
-    const path = route.path.split('/')[1];
-    return navStore.routes[path]
-})
-
-const pageTitle = computed(() => {
-    const pathParts = route.path.split('/')
-
-    if (pathParts.length > 2) {
-        const section = navStore.routes[pathParts[1]]
-        const item = section?.items.find(item => item.path === route.path)
-
-        return item?.label || ''
-    }
-
-    return currentSection.value?.label || ''
-})
-
-watch(currentSection, (newSection) => {
-  if (!newSection) {
-    isNavigating.value = true
-    router.replace({ name: 'notFound' })
-    isNavigating.value = false
-  }
-}), { immediate: true }
+const retryCount = ref(0);
+const maxRetries = 3;
 
 defineProps({
     content: {
         type: String,
         default: ''
     }
-})
+});
+
+const currentSection = computed(() => {
+    const path = route.path.split('/')[1];
+    return navStore.routes[path];
+});
+
+const pageTitle = computed(() => {
+    const pathParts = route.path.split('/');
+    if (pathParts.length > 2) {
+        const item = currentSection.value?.items?.find(
+            item => item.path === route.path
+        );
+        return item?.label || '';
+    }
+    return currentSection.value?.label || '';
+});
+
+const checkRouteValidity = async () => {
+  loading.value = true;
+  isNavigating.value = true;
+  
+  try {
+    // Only fetch if not already loaded
+    if (!navStore.initialized) {
+      await navStore.getSection();
+    }
+    
+    // Get the section key from the path
+    const sectionKey = route.path.split('/')[1];
+    
+    // Check if the section exists
+    if (!navStore.routes[sectionKey]) {
+      // Retry a few times with delay before giving up
+      if (retryCount.value < maxRetries) {
+        retryCount.value++;
+        await new Promise(resolve => setTimeout(resolve, 300));
+        loading.value = false;
+        isNavigating.value = false;
+        return checkRouteValidity();
+      }
+      
+      console.log(`Section not found after retries: ${sectionKey}`);
+      router.replace({ name: 'notFound' });
+      return;
+    }
+    
+    // For item routes, check if the item exists
+    if (route.path.split('/').length > 2) {
+      const itemExists = navStore.routes[sectionKey]?.items?.some(
+        item => item.path === route.path
+      );
+      
+      if (!itemExists) {
+        console.log(`Item not found in section ${sectionKey}: ${route.path}`);
+        router.replace({ name: 'notFound' });
+        return;
+      }
+    }
+  } catch (error) {
+    console.error('Route validation error:', error);
+    // Only redirect if we're not already on notFound
+    if (route.name !== 'notFound') {
+      router.replace({ name: 'notFound' });
+    }
+  } finally {
+    loading.value = false;
+    isNavigating.value = false;
+    retryCount.value = 0;
+  }
+};
+
+onMounted(async () => {
+  await checkRouteValidity();
+});
+
+
+watch(() => route.path, checkRouteValidity);
+
+// Only check after initialization
+watch(() => navStore.initialized, (initialized) => {
+    if (initialized) checkRouteValidity();
+});
 </script>

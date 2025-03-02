@@ -63,16 +63,17 @@ export const useContentStore = defineStore('content', {
                 
                 if (!content) throw new Error('Content not found');
                 
-                    
-                // Make API call to update the title
-                await api.put(`/api/contents/${content.id}`, {
+                const response = await api.put(`/api/contents/${content.id}`, {
                     title: newTitle,
                     body: this.cards[id].body
-                });
+                  });
         
                 // Update both the card and allContent
-                this.cards[id].title = newTitle;
-                this.allContent[cardIndex].title = newTitle;
+                if (response.data) {
+                    this.cards[id].title = newTitle;
+                    this.allContent[cardIndex].title = newTitle;
+                }
+
             } catch (error) {
                 throw new Error(error.response?.data?.message || 'Failed to update title');
             } finally {
@@ -88,7 +89,7 @@ export const useContentStore = defineStore('content', {
                 
                 if (!content) throw new Error('Content not found');
                 
-
+                await api.get('/sanctum/csrf-cookie');  
                 // Make API call to update the body
                 await api.put(`/api/contents/${content.id}`, {
                 title: this.cards[id].title,

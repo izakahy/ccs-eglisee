@@ -55,6 +55,14 @@ const router = createRouter({
     },
   ],
 })
+// router.beforeEach((to, from) => {
+//   document.title = to.meta?.title ?? router.routes.name
+// })
+router.beforeEach(async (to, from, next) => {
+  const navStore = useNavigationStore();
+  await navStore.getSection(); // Uses cache if valid, fetches if needed
+  next();
+});
 
 router.onError((error, to) => {
   console.error('Navigation error:', error);
@@ -62,6 +70,40 @@ router.onError((error, to) => {
     router.push({ name: 'notFound' });
   }
 });
+
+let isInitialized = false
+
+export async function initializeRouter() {
+  console.log('Setting up router');
+  const navigationStore = useNavigationStore();
+
+  router.beforeEach(async (to, from, next) => {
+    try {
+      if (!isInitialized) {
+        // Fetch navigation data and add dynamic routes
+        await navigationStore.getSection();
+        addDynamicRoutes();
+        isInitialized = true;
+        // Re-trigger navigation to the current path to match dynamic routes
+        next(to.fullPath);
+      } else {
+        // If already initialized, proceed normally
+        next();
+      }
+    } catch (error) {
+      console.error('Navigation guard error:', error);
+      // Redirect to notFound only if not already there
+      if (to.name !== 'notFound') {
+        next({ name: 'notFound' });
+      } else {
+        next(); // Avoid infinite loops
+      }
+    }
+  });
+
+  console.log('Router setup complete');
+}
+
 
 export function addDynamicRoutes() {
   const navigationStore = useNavigationStore();
@@ -80,9 +122,13 @@ export function addDynamicRoutes() {
   });
 }
 
+
 router.onError((error) => {
   console.error('Navigation Error:', error);
-  router.push({ name: 'notFound' });
+
+  if (!to || to.name !== 'notFound') {
+    router.push({ name: 'notFound' });
+  }
 });
 
 export default router
