@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { api } from "./Auth";
+import { ref } from "vue";
 
 const body = `Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc
               orci sit pharetra adipiscing aenean. Non at aliquam cursus
@@ -11,22 +12,17 @@ export const useContentStore = defineStore('content', {
     
     state: () => ({
         cards: {
-            card1: {
-                title: 'Title',
-                body,
-            },
-            card2: {
-                title: 'Title',
-                body,
-            },
-            card3: {
-                title: 'Title',
-                body,
-            }
+            card1: { title: 'Title', body },
+            card2: { title: 'Title', body },
+            card3: { title: 'Title', body }
         },
         allContent: [],
+        pageCount: {},
+        errors: [],
+        isEditing: false,
         isLoading: false,
-        errors: []
+        isAuthenticated: false,
+        pageContent: {}
     }),
 
     actions: {
@@ -80,7 +76,7 @@ export const useContentStore = defineStore('content', {
                 this.isLoading = false;
             }
         },
-       async updateBody(id, newBody) {
+        async updateBody(id, newBody) {
             this.isLoading = true;
             try {
                 // Find the content ID from allContent that corresponds to this card
@@ -104,6 +100,56 @@ export const useContentStore = defineStore('content', {
             } finally {
                 this.isLoading = false;
             }
+        },
+        async loadPageContent() {
+            this.isLoading = true;
+            try {
+              const storedContent = localStorage.getItem('pageContent');
+              if (storedContent) {
+                this.pageContent = JSON.parse(storedContent);
+              }
+            } catch (error) {
+              console.error("Failed to load content: ", error);
+            } finally {
+              this.isLoading = false;
+            }
+        },
+        async saveContent(path, content) {
+            this.isLoading = true;
+            try {
+              this.pageContent[path] = content;
+              localStorage.setItem('pageContent', JSON.stringify(this.pageContent));
+              return true;
+            } catch (error) {
+              console.error('Failed to save content:', error);
+              return false;
+            } finally {
+              this.isLoading = false;
+            }
+        },
+        async deleteContent(path) {
+            this.isLoading = true;
+            try {
+            if (this.pageContent[path]) {
+                delete this.pageContent[path];
+                localStorage.setItem('pageContent', JSON.stringify(this.pageContent));
+            }
+            return true;
+            } catch (error) {
+            console.error('Failed to delete content:', error);
+            return false;
+            } finally {
+            this.isLoading = false;
+            }
+        },
+        async toggleEditMode() {
+           this.isEditing = !this.isEditing;
+        }
+    },
+
+    getters: {
+        getPageContent: (state) => (path) => {
+            return state.pageContent[path] || '';
         }
     }
 });

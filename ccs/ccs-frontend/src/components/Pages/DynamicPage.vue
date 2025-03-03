@@ -6,16 +6,23 @@
       <div class="prose max-w-none">
         <slot>
           <!-- Default content can be customized based on route -->
-          <div v-if="content" v-html="content"></div>
-          <div v-else class="text-gray-600">
-            Content for {{ pageTitle }} will be added soon.
-          </div>
+          <PageEditor v-if="hasContent" />
+          
+          <slot v-else>
+            <div v-if="content" v-html="content"></div>
+            <div v-else class="text-gray-600">
+              Content for {{ pageTitle }} will be added soon.
+            </div>
+            <PageEditor v-if="isAuthenticated"/>
+          </slot>
         </slot>
       </div>
     </div>
+
     <div v-else-if="!isNavigating">
       <NotFoundView />
     </div>
+
     <div v-else class="text-center py-8">
       <!-- Loading spinner -->
       <svg class="animate-spin h-8 w-8 text-gray-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -30,11 +37,16 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useNavigationStore } from '@/stores/NavItems/Navigation';
+import { useContentStore } from '@/stores/Content';
 import NotFoundView from '@/views/NotFoundView.vue';
+import PageEditor from './PageEditor.vue';
+import { useAuthStore } from '@/stores/Auth';
 
 const route = useRoute();
 const router = useRouter();
 const navStore = useNavigationStore();
+const contentStore = useContentStore()
+const authStore = useAuthStore()
 const loading = ref(true);
 const isNavigating = ref(false);
 const retryCount = ref(0);
@@ -46,6 +58,12 @@ defineProps({
         default: ''
     }
 });
+
+const isAuthenticated = computed(() => authStore.checkAuth())
+const currentPath = computed(() => route.path)
+const hasContent = computed(() => {
+  return contentStore.getPageContent(currentPath.value)
+})
 
 const currentSection = computed(() => {
     const path = route.path.split('/')[1];
@@ -119,6 +137,7 @@ const checkRouteValidity = async () => {
 
 onMounted(async () => {
   await checkRouteValidity();
+  await contentStore.loadPageContent()
 });
 
 
