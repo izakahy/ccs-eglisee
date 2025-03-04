@@ -5,7 +5,23 @@
 @layer components {
   /* Base editor styles */
   .editor-content {
-    @apply whitespace-pre-wrap; /* Preserve spaces and line breaks */
+    @apply whitespace-pre-wrap w-full h-full min-h-[200px] p-4;
+  }
+
+  /* Ensure ProseMirror fills the container and has no focus outline */
+  .editor-content .ProseMirror {
+    @apply w-full h-full;
+    outline: none !important; /* Forcefully remove outline */
+    &:focus {
+      outline: none !important; /* Ensure focus state has no outline */
+      box-shadow: none !important; /* Remove any shadow if present */
+    }
+  }
+
+  /* Empty state placeholder */
+  .editor-content .ProseMirror:empty::before {
+    content: 'Start typing...';
+    @apply text-gray-400 pointer-events-none w-full block;
   }
 
   /* Headings */
@@ -72,7 +88,6 @@
     @apply whitespace-pre-wrap;
   }
 
-
   .tiptap-content {
     .paragraph-node {
       @apply mb-3 text-gray-800;
@@ -95,7 +110,6 @@
         @apply mb-1;
       }
     }
-  
   }
 }
 
