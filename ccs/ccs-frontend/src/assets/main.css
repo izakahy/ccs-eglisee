@@ -5,7 +5,7 @@
 @layer components {
   /* Base editor styles */
   .editor-content {
-    @apply whitespace-pre-wrap w-full h-full min-h-[200px] p-4;
+    @apply whitespace-pre-wrap w-full h-full min-h-[200px] p-4 break-words;
   }
 
   /* Ensure ProseMirror fills the container and has no focus outline */

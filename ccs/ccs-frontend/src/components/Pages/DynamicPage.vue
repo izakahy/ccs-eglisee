@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto px-4 py-8">
     <div v-if="currentSection">
-      <h1 class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
+      <h1 v-if="!hasContent" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
      
       <div class="prose max-w-none">
         <slot>
@@ -13,7 +13,7 @@
             <div v-else class="text-gray-600">
               Content for {{ pageTitle }} will be added soon.
             </div>
-            <PageEditor v-if="isAuthenticated"/>
+            <PageEditor v-if="isAuthenticated || hasContent"/>
           </slot>
         </slot>
       </div>
@@ -41,6 +41,7 @@ import { useContentStore } from '@/stores/Content';
 import NotFoundView from '@/views/NotFoundView.vue';
 import PageEditor from './PageEditor.vue';
 import { useAuthStore } from '@/stores/Auth';
+import layouts from '@/stores/layout';
 
 const route = useRoute();
 const router = useRouter();
