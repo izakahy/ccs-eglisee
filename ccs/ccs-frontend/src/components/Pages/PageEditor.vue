@@ -70,59 +70,26 @@
                 <h3 class="text-sm font-medium text-gray-700 capitalize">Edit {{ area }}</h3>
               </div>
               <!-- Toolbar -->
-              <div v-if="editors[area]" class="flex gap-1 p-2 border-b bg-white flex-wrap">
-                <button 
-                  @click="editors[area].chain().focus().toggleBold().run()"
-                  :class="{ 'bg-gray-100 text-gray-900': editors[area]?.isActive('bold') }"
-                  class="p-2 hover:bg-gray-100 rounded-md text-gray-600 transition-colors"
-                  title="Bold (Ctrl+B)"
-                >
-                  <i class="fa-solid fa-bold w-4 h-4"></i>
-                </button>
-                <button 
-                  @click="editors[area].chain().focus().toggleItalic().run()"
-                  :class="{ 'bg-gray-100 text-gray-900': editors[area]?.isActive('italic') }"
-                  class="p-2 hover:bg-gray-100 rounded-md text-gray-600 transition-colors"
-                  title="Italic (Ctrl+I)"
-                >
-                  <i class="fa-solid fa-italic w-4 h-4"></i>
-                </button>
-                <select 
-                  @change="e => updateHeading(area, e.target.value)"
-                  :value="currentHeadingLevel(area)"
-                  class="p-2 hover:bg-gray-100 rounded-md text-gray-600 border-0 focus:ring-0 focus:outline-none"
-                  title="Heading style"
-                >
-                  <option value="">Normal</option>
-                  <option value="1">Heading 1</option>
-                  <option value="2">Heading 2</option>
-                  <option value="3">Heading 3</option>
-                </select>
-                <button 
-                  @click="editors[area].chain().focus().toggleBulletList().run()"
-                  :class="{ 'bg-gray-100 text-gray-900': editors[area]?.isActive('bulletList') }"
-                  class="p-2 hover:bg-gray-100 rounded-md text-gray-600 transition-colors"
-                  title="Bullet List"
-                >
-                  <i class="fa-solid fa-list w-4 h-4"></i>
-                </button>
-                <button 
-                  @click="triggerFileInput(area)"
-                  class="p-2 hover:bg-gray-100 rounded-md text-gray-600 transition-colors"
-                  title="Insert Image"
-                >
-                  <i class="fa-solid fa-image w-4 h-4"></i>
-                </button>
-                
-                <!-- Hidden file input for image upload -->
-                <input 
-                  type="file"
-                  :ref="el => fileInputs[area] = el"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleFileUpload($event, area)"
-                />
-              </div>
+              <EditorToolbar
+                :editor="editors[area]"
+                :current-heading-level="currentHeadingLevel(area)"
+                :features="{
+                  underline: true,
+                  orderedList: true,
+                  textAlign: true,
+                  highlight: true,
+                  image: true
+                }"
+                @heading-update="level => updateHeading(area, level)"
+                @insert-image="triggerFileInput(area)" 
+              />
+              <input 
+                type="file"
+                :ref="el => fileInputs[area] = el"
+                accept="image/*"
+                class="hidden"
+                @change="handleFileUpload($event, area)"
+              />
               <!-- Editor Content -->
               <div 
                 class="border-0 bg-white h-[500px] cursor-text p-3 overflow-y-auto"
@@ -155,18 +122,18 @@
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from "vue";
+import { EditorContent } from "@tiptap/vue-3";
+import EditorToolbar from "../Helper/EditorToolbar.vue";
 import { useRoute } from "vue-router";
 import { useContentStore } from "@/stores/Content";
 import { useAuthStore } from "@/stores/Auth";
-import { Editor, EditorContent } from "@tiptap/vue-3";
-import StarterKit from "@tiptap/starter-kit";
-import Image from '@tiptap/extension-image';
 import layouts from "@/stores/layout";
 import SingleColumnLayout from "./Layouts/SingleColumnLayout.vue";
 import TwoColumnLayout from "./Layouts/TwoColumnLayout.vue";
 import LayoutSelector from "./Layouts/LayoutSelector.vue";
 import PreviewDialog from "./Layouts/PreviewDialog.vue";
 import DefaultLayout from "./Layouts/DefaultLayout.vue";
+import { useTipTap } from "@/composables/useTipTap";
 
 const layoutComponents = {
   single: SingleColumnLayout,
@@ -193,7 +160,6 @@ const showLayoutDialog = ref(false);
 const showPreviewDialog = ref(false);
 const fileInputs = ref({});
 const isUploading = ref(false);
-
 
 // Compute current layout name for display
 const currentLayoutName = computed(() => {
@@ -225,22 +191,14 @@ const editorClass = (area) => {
 const initEditors = () => {
   currentContentAreas.value.forEach((area) => {
     if (!editors.value[area]) {
-      editors.value[area] = new Editor({
+      const { initEditor } = useTipTap({
         content: editableContents.value[area] || "",
-        extensions: [
-          StarterKit,
-          Image.configure({
-            inline: false,
-            allowBase64: true,
-          })
-        ],
-        onUpdate: ({ editor }) => {
+        withImage: true,
+        onUpdate: (editor) => {
           editableContents.value[area] = editor.getHTML();
-        },
-      });
-      nextTick(() => {
-        editors.value[area].commands.focus();
-      });
+        }
+      })
+      editors.value[area] = initEditor();
     }
   });
 };
@@ -259,7 +217,7 @@ const handleFileUpload = async (event, area) => {
   }
   
   // Set uploading state
-  isUploading.ref = true;
+  isUploading.value = true;
   
   try {
     const reader = new FileReader();
@@ -271,18 +229,18 @@ const handleFileUpload = async (event, area) => {
       if (fileInputs.value[area]) {
         fileInputs.value[area].value = '';
       }
-      isUploading.ref = false;
+      isUploading.value = false;
     };
     reader.readAsDataURL(file);
   } catch (error) {
     console.error('Error uploading image:', error);
     alert('Failed to upload image');
-    isUploading.ref = false;
+    isUploading.value = false;
   }
 };
 
 const destroyEditors = () => {
-  Object.values(editors.value).forEach((editor) => editor.destroy());
+  Object.values(editors.value).forEach((editor) => editor?.destroy());
   editors.value = {};
 };
 
@@ -312,13 +270,15 @@ const updateHeading = (area, level) => {
 // Handle layout change
 watch(editableLayout, (newLayout) => {
   destroyEditors();
-  const areas = layouts.find((l) => l.id === newLayout)?.areas || [];
-  const newContents = {};
-  areas.forEach((area) => {
-    newContents[area] = editableContents.value[area] || "";
-  });
-  editableContents.value = newContents;
-  initEditors();
+  nextTick(() => {
+    const areas = layouts.find((l) => l.id === newLayout)?.areas || [];
+    const newContents = {};
+    areas.forEach((area) => {
+      newContents[area] = editableContents.value[area] || "";
+    });
+    editableContents.value = newContents;
+    initEditors();
+  })  
 });
 
 // Sync state when entering edit mode
