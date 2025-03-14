@@ -69,34 +69,86 @@
               <div class="px-4 py-3 bg-gray-50 border-b">
                 <h3 class="text-sm font-medium text-gray-700 capitalize">Edit {{ area }}</h3>
               </div>
-              <!-- Toolbar -->
-              <EditorToolbar
-                :editor="editors[area]"
-                :current-heading-level="currentHeadingLevel(area)"
-                :features="{
-                  underline: true,
-                  orderedList: true,
-                  textAlign: true,
-                  highlight: true,
-                  image: true
-                }"
-                @heading-update="level => updateHeading(area, level)"
-                @insert-image="triggerFileInput(area)" 
-              />
-              <input 
-                type="file"
-                :ref="el => fileInputs[area] = el"
-                accept="image/*"
-                class="hidden"
-                @change="handleFileUpload($event, area)"
-              />
-              <!-- Editor Content -->
-              <div 
-                class="border-0 bg-white h-[500px] cursor-text p-3 overflow-y-auto"
-                @click="focusEditor(area)"
-              >
-                <EditorContent :editor="editors[area]" class="editor-content" />
+              <div v-if="area === 'bgIMG'" class="p-6 space-y-6 bg-white rounded-xl shadow-sm">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Background Image URL</label>
+                  <div class="relative">
+                    <input 
+                      type="text"
+                      v-model="editableContents.bgIMG.src"
+                      placeholder="https://example.com/image.jpg"
+                      class="w-full p-3 pl-4 pr-10 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                    />
+                    <button 
+                      v-if="editableContents.bgIMG" 
+                      @click="editableContents.bgIMG = ''"
+                      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Image Caption</label>
+                  <input 
+                    type="text"
+                    v-model="editableContents.bgIMG.caption"
+                    placeholder="Enter caption (e.g., 'Sunset over mountains')"
+                    class="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                  />
+                </div>
+                
+                <div class="space-y-2">
+                  <label class="block text-sm font-medium text-gray-700">Upload an Image</label>
+                  <div 
+                    class="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center hover:border-primary/70 transition-colors duration-200 cursor-pointer"
+                    @click="triggerFileInput(area)"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-2 text-gray-400"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    <p class="text-sm text-gray-500">Drag and drop an image here or click to browse</p>
+                    <p class="text-xs text-gray-400 mt-1">Supports JPG, PNG, GIF (Max 5MB)</p>
+                    <input 
+                      :ref="el => fileInputs[area] = el"
+                      type="file"
+                      accept="image/*"
+                      class="hidden"
+                      @change="handleBgImageUpload"
+                    />
+                  </div>
+                </div>
               </div>
+
+              <div v-else>
+                <!-- Toolbar -->
+                <EditorToolbar
+                  :editor="editors[area]"
+                  :current-heading-level="currentHeadingLevel(area)"
+                  :features="{
+                    underline: true,
+                    orderedList: true,
+                    textAlign: true,
+                    highlight: true,
+                    image: true
+                  }"
+                  @heading-update="level => updateHeading(area, level)"
+                  @insert-image="triggerFileInput(area)" 
+                />
+                <input 
+                  type="file"
+                  :ref="el => fileInputs[area] = el"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleBgImageUpload($event)"
+                />
+                <!-- Editor Content -->
+                <div 
+                  class="border-0 bg-white h-[500px] cursor-text p-3 overflow-y-auto"
+                  @click="focusEditor(area)"
+                >
+                  <EditorContent :editor="editors[area]" class="editor-content" />
+                </div>
+              </div> 
             </div>
           </div>
         </div>
@@ -159,6 +211,7 @@ const editors = ref({});
 const showLayoutDialog = ref(false);
 const showPreviewDialog = ref(false);
 const fileInputs = ref({});
+const bgFileInput = ref(null);
 const isUploading = ref(false);
 
 // Compute current layout name for display
@@ -190,7 +243,7 @@ const editorClass = (area) => {
 // Initialize editors and focus them
 const initEditors = () => {
   currentContentAreas.value.forEach((area) => {
-    if (!editors.value[area]) {
+    if (area !== 'bgIMG' && !editors.value[area]) {
       const { initEditor } = useTipTap({
         content: editableContents.value[area] || "",
         withImage: true,
@@ -204,39 +257,60 @@ const initEditors = () => {
 };
 
 const triggerFileInput = (area) => {
+  if (area === 'bgIMG') {
+    editableContents.value.bgIMG.src = ''; 
+    editableContents.value.bgIMG.caption = ''; 
+  }
   if (fileInputs.value[area]) {
     fileInputs.value[area].click();
   }
 };
 
-const handleFileUpload = async (event, area) => {
+const triggerBgFileInput = () => {
+  editableContents.value.bgIMG = '';
+  if (bgFileInput.value) {
+    bgFileInput.value.click();
+  } else {
+    console.error("Background file input not found");
+  }
+};
+
+const handleBgImageUpload = (event) => {
   const file = event.target.files[0];
   if (!file || !file.type.includes('image')) {
     alert('Please select a valid image file');
     return;
   }
-  
-  // Set uploading state
-  isUploading.value = true;
-  
-  try {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (editors.value[area]) {
-        editors.value[area].chain().focus().setImage({ src: e.target.result }).run();
-      }
-      // Reset file input
-      if (fileInputs.value[area]) {
-        fileInputs.value[area].value = '';
-      }
-      isUploading.value = false;
-    };
-    reader.readAsDataURL(file);
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    alert('Failed to upload image');
-    isUploading.value = false;
+  if (typeof editableContents.value.bgIMG !== 'object' || editableContents.value.bgIMG === null) {
+    editableContents.value.bgIMG = { src: '', caption: '' };
   }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    editableContents.value.bgIMG.src = e.target.result; 
+
+    if (!editableContents.value.bgIMG.caption) {
+      editableContents.value.bgIMG.caption = `Image: ${file.name}`;
+    }
+
+    event.target.value = ''; 
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleEditorImageUpload = (area, event) => {
+  const file = event.target.files[0];
+  if (!file || !file.type.includes('image')) {
+    alert('Please select a valid image file');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    if (editors.value[area]) {
+      editors.value[area].chain().focus().setImage({ src: e.target.result }).run();
+    }
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
 };
 
 const destroyEditors = () => {
@@ -293,7 +367,13 @@ watch(() => contentStore.isEditing, (isEditing) => {
 
 const initEditable = () => {
   editableLayout.value = pageData.value.layout || "single";
-  editableContents.value = { ...pageData.value.contents };
+  const contents = { ...pageData.value.contents };
+  
+  contents.bgIMG = contents.bgIMG
+    ? (typeof contents.bgIMG === 'string' ? { src: contents.bgIMG, caption: '' } : contents.bgIMG)
+    : { src: '', caption: '' };
+
+  editableContents.value = contents;
 };
 
 onMounted(async () => {
@@ -310,6 +390,11 @@ onBeforeUnmount(() => {
 
 // Save handler
 const saveContent = async () => {
+  if (editableContents.value.bgIMG.caption.startsWith('Image')) {
+    if(!confirm('Do you want to save this caption name?')) {
+      return;
+    }
+  }
   const success = await contentStore.saveContent(currentPath.value, {
     layout: editableLayout.value,
     contents: editableContents.value,

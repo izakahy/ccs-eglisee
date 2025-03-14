@@ -1,12 +1,12 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="container mx-auto" :class="{ 'px-4 py-8' : !isFullWidthLayout }">
     <div v-if="currentSection">
-      <h1 v-if="!hasContent" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
+      <h1 v-if="!hasContent || !hasContentWithHeading" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
      
       <div class="prose max-w-none">
         <slot>
           <!-- Default content can be customized based on route -->
-          <PageEditor v-if="hasContent" />
+          <PageEditor v-if="hasContent && (typeof pageContent === 'object' && pageContent !== null)" />
           
           <slot v-else>
             <div v-if="content" v-html="content"></div>
@@ -41,7 +41,7 @@ import { useContentStore } from '@/stores/Content';
 import NotFoundView from '@/views/NotFoundView.vue';
 import PageEditor from './PageEditor.vue';
 import { useAuthStore } from '@/stores/Auth';
-import layouts from '@/stores/layout';
+import DefaultLayout from "./Layouts/DefaultLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -60,11 +60,21 @@ defineProps({
     }
 });
 
+const fullWidthLayouts = ['default'];
+const pageContent = ref({})
+
 const isAuthenticated = computed(() => authStore.checkAuth())
 const currentPath = computed(() => route.path)
 const hasContent = computed(() => {
-  return contentStore.getPageContent(currentPath.value)
+  pageContent.value = contentStore.getPageContent(currentPath.value)
+  console.log(pageContent.value)
+  return pageContent.value
 })
+
+const hasContentWithHeading = computed(() => {
+  return pageContent.value?.contents?.content1 && 
+         pageContent.value.contents.content1.includes('<h1');
+});
 
 const currentSection = computed(() => {
     const path = route.path.split('/')[1];
@@ -81,6 +91,15 @@ const pageTitle = computed(() => {
     }
     return currentSection.value?.label || '';
 });
+
+const pageData = computed(() => contentStore.getPageContent(currentPath.value) || {
+  layout: "single",
+  contents: { content1: "" },
+});
+const isFullWidthLayout = computed(() => {
+  const layoutName = pageData.value.layout || 'default';
+  return fullWidthLayouts.includes(layoutName);
+})
 
 const checkRouteValidity = async () => {
   loading.value = true;
