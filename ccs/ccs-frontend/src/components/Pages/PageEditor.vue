@@ -72,7 +72,7 @@
               <div v-if="area === 'bgIMG'" class="p-6 space-y-6 bg-white rounded-xl shadow-sm">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Background Image URL</label>
-                  <div class="relative">
+                  <div v-if="editableContents.bgIMG" class="relative">
                     <input 
                       type="text"
                       v-model="editableContents.bgIMG.src"
@@ -117,6 +117,51 @@
                     />
                   </div>
                 </div>
+              </div>
+
+              <div v-else-if="area === 'boardItems'" class="p-6 space-y-4">
+                  <h3 class="text-lg font-medium">{{editableContents?.boardItems?.length}} Board Items</h3>
+                  <div v-for="(item, index) in editableContents.boardItems" :key="index" class="bg-gray-50 p-4 rounded-lg space-y-3">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Profile Picture URL</label>
+                      <input
+                        v-model="item.pfp"
+                        type="text"
+                        placeholder="https://example.com/profile.jpg"
+                        class="mt-1 block w-full rounded-md p-3 border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Name</label>
+                      <input
+                        v-model="item.name"
+                        type="text"
+                        placeholder="Enter name"
+                        class="mt-1 block w-full rounded-md p-3 border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Role</label>
+                      <input
+                        v-model="item.role"
+                        type="text"
+                        placeholder="Enter role"
+                        class="mt-1 block w-full rounded-md p-3 border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                      />
+                    </div>
+                    <button
+                      @click="removeBoardItem(index)"
+                      class="text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <button
+                    @click="addBoardItem"
+                    class="mt-4 inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
+                  >
+                    Add Item
+                  </button>
               </div>
 
               <div v-else>
@@ -185,12 +230,14 @@ import TwoColumnLayout from "./Layouts/TwoColumnLayout.vue";
 import LayoutSelector from "./Layouts/LayoutSelector.vue";
 import PreviewDialog from "./Layouts/PreviewDialog.vue";
 import DefaultLayout from "./Layouts/DefaultLayout.vue";
+import BoardLayout from "./Layouts/BoardLayout.vue";
 import { useTipTap } from "@/composables/useTipTap";
 
 const layoutComponents = {
   single: SingleColumnLayout,
   twoColumn: TwoColumnLayout,
-  default: DefaultLayout
+  default: DefaultLayout,
+  board: BoardLayout
 };
 
 const route = useRoute();
@@ -254,6 +301,17 @@ const initEditors = () => {
       editors.value[area] = initEditor();
     }
   });
+};
+
+const addBoardItem = () => {
+  if (!editableContents.value.boardItems) {
+    editableContents.value.boardItems = [];
+  }
+  editableContents.value.boardItems.push({ pfp: '', name: '', role: '' });
+};
+
+const removeBoardItem = (index) => {
+  editableContents.value.boardItems.splice(index, 1);
 };
 
 const triggerFileInput = (area) => {
@@ -348,7 +406,11 @@ watch(editableLayout, (newLayout) => {
     const areas = layouts.find((l) => l.id === newLayout)?.areas || [];
     const newContents = {};
     areas.forEach((area) => {
-      newContents[area] = editableContents.value[area] || "";
+      if (area === 'boardItems' && newLayout === 'board') {
+        newContents[area] = Array.isArray(editableContents.value[area]) ? editableContents.value[area] : [];
+      } else {
+        newContents[area] = editableContents.value[area] || "";
+      }
     });
     editableContents.value = newContents;
     initEditors();
@@ -373,6 +435,21 @@ const initEditable = () => {
     ? (typeof contents.bgIMG === 'string' ? { src: contents.bgIMG, caption: '' } : contents.bgIMG)
     : { src: '', caption: '' };
 
+  if (editableLayout.value === 'board') {
+    if (!contents.content1) {
+      contents.content1 = `
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-semibold text-gray-800 mb-4">Our Spiritual Leadership</h2>
+          <div class="w-24 h-1 bg-primary mx-auto mb-6"></div>
+          <p class="text-gray-600 max-w-2xl mx-auto">Guided by faith and committed to service, our Board of Directors leads with wisdom, compassion, and dedication to our church's mission and values.</p>
+        </div>
+      `;
+    }
+    if (!contents.boardItems) {
+      contents.boardItems = [];
+    }
+  }
+
   editableContents.value = contents;
 };
 
@@ -390,7 +467,7 @@ onBeforeUnmount(() => {
 
 // Save handler
 const saveContent = async () => {
-  if (editableContents.value.bgIMG.caption.startsWith('Image')) {
+  if (editableContents.value.bgIMG?.caption?.startsWith('Image')) {
     if(!confirm('Do you want to save this caption name?')) {
       return;
     }
