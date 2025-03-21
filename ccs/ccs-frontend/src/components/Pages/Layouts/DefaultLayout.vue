@@ -46,8 +46,13 @@
   </div>
 </template>
   
-  <script setup>
+<script setup>
+import { ref } from 'vue';
+
   const props = defineProps(['contents']);
+
+  const loading = ref(true);
+  
   defineExpose({
     fullWidthLayout: true
   });

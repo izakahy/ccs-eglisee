@@ -54,13 +54,15 @@
 <script setup>
 import { ref, watch } from 'vue';
 import SingleColumnLayout from './SingleColumnLayout.vue';
-import TwoColumnLayout from './TwoColumnLayout.vue';
+import GallaryLayout from './GallaryLayout.vue';
 import DefaultLayout from './DefaultLayout.vue';
+import BoardLayout from './BoardLayout.vue';
 
 const layoutComponents = {
   single: SingleColumnLayout,
-  twoColumn: TwoColumnLayout,
+  gallary: GallaryLayout,
   default: DefaultLayout,
+  board: BoardLayout
 }
 
 const props = defineProps({

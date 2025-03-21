@@ -92,6 +92,7 @@
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Image Caption</label>
                   <input 
+                    v-if="editableContents.bgIMG"
                     type="text"
                     v-model="editableContents.bgIMG.caption"
                     placeholder="Enter caption (e.g., 'Sunset over mountains')"
@@ -118,7 +119,14 @@
                   </div>
                 </div>
               </div>
-
+              <div v-else-if="area === 'galleryItems'" class="p-0">
+                <GalleryItemEditor
+                  v-model="editableContents.galleryItems"
+                  :scripture="editableContents.scripture"
+                  @update:scripture="editableContents.scripture = $event"
+                  @trigger-upload="handleGalleryImageUpload($event)"
+                />
+              </div>
               <div v-else-if="area === 'boardItems'" class="p-6 space-y-4">
                   <h3 class="text-lg font-medium">{{editableContents?.boardItems?.length}} Board Items</h3>
                   <div v-for="(item, index) in editableContents.boardItems" :key="index" class="bg-gray-50 p-4 rounded-lg space-y-3">
@@ -226,16 +234,17 @@ import { useContentStore } from "@/stores/Content";
 import { useAuthStore } from "@/stores/Auth";
 import layouts from "@/stores/layout";
 import SingleColumnLayout from "./Layouts/SingleColumnLayout.vue";
-import TwoColumnLayout from "./Layouts/TwoColumnLayout.vue";
+import GallaryLayout from "./Layouts/GallaryLayout.vue";
 import LayoutSelector from "./Layouts/LayoutSelector.vue";
 import PreviewDialog from "./Layouts/PreviewDialog.vue";
 import DefaultLayout from "./Layouts/DefaultLayout.vue";
 import BoardLayout from "./Layouts/BoardLayout.vue";
 import { useTipTap } from "@/composables/useTipTap";
+import GalleryItemEditor from "./Layouts/GalleryItemEditor.vue";
 
 const layoutComponents = {
   single: SingleColumnLayout,
-  twoColumn: TwoColumnLayout,
+  gallary: GallaryLayout,
   default: DefaultLayout,
   board: BoardLayout
 };
@@ -274,14 +283,14 @@ const currentContentAreas = computed(() => {
 
 // Dynamic class for editor container based on layout
 const editorContainerClass = computed(() => {
-  return editableLayout.value === 'twoColumn'
-    ? 'grid grid-cols-1 md:grid-cols-3 gap-8'
+  return editableLayout.value === 'gallary'
+    ? 'grid grid-cols-1 gap-8'
     : 'max-w-4xl mx-auto';
 });
 
 // Dynamic class for each editor based on layout
 const editorClass = (area) => {
-  if (editableLayout.value === 'twoColumn') {
+  if (editableLayout.value === 'gallary') {
     return area === 'content1' ? 'md:col-span-2' : 'md:col-span-1';
   }
   return '';
@@ -369,6 +378,38 @@ const handleEditorImageUpload = (area, event) => {
     event.target.value = '';
   };
   reader.readAsDataURL(file);
+};
+
+const handleGalleryImageUpload = (index) => {
+  // Create a new file input element for this specific upload
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  
+  fileInput.onchange = (event) => {
+    const file = event.target.files[0];
+    if (!file || !file.type.includes('image')) {
+      alert('Please select a valid image file');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // Make sure galleryItems exists and has items
+      if (!Array.isArray(editableContents.value.galleryItems)) {
+        editableContents.value.galleryItems = [];
+      }
+      
+      // Update the image at the specified index
+      if (editableContents.value.galleryItems[index]) {
+        editableContents.value.galleryItems[index].image = e.target.result;
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  // Trigger the file dialog
+  fileInput.click();
 };
 
 const destroyEditors = () => {

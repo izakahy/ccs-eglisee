@@ -3,7 +3,7 @@
     <AppHeader class="sticky w-full top-0 transition-all duration-300 z-[10]" />
     
     <!-- Loading Overlay -->
-    <div v-if="!navStore.initialized" class="fixed inset-0 flex items-center justify-center bg-black/5 backdrop-blur-sm z-20">
+    <div v-if="!navStore.initialized" class="">
       <div class="flex flex-col items-center p-6 rounded-lg">
         <svg class="animate-spin h-12 w-12 text-indigo-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

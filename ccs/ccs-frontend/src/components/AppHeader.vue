@@ -42,55 +42,115 @@ const isAuthenticated = computed(() => authStore.checkAuth());
 
 
 const isAtTop = ref(true);
-let lastScrollY = ref(window.scrollY);
-const SCROLL_DELTA = 5;
-const TOP_BUFFER = 20; 
-const THRESHOLD_BUFFER = 10; // Buffer to prevent flickering near threshold
+let lastScrollY = ref(0);
+
+const SCROLL_THRESHOLD = 20;
+const TOP_THRESHOLD = 20;  
+const DEBOUNCE_TIME = 50; 
+const HYSTERESIS_BUFFER = 15; 
+
 let scrollTimeout = null;
+let ticking = false;
+let transitionInProgress = false;
+let transitionTimeout = null;
+
 
 const handleScroll = () => {
-  // Clear existing timeout
+  lastScrollY.value = window.scrollY;
+  
+  // Use requestAnimationFrame for smoother visual updates
+  if (!ticking) {
+    window.requestAnimationFrame(() => {
+      if (!transitionInProgress) {
+        updateNavState();
+      }
+      ticking = false;
+    });
+    ticking = true;
+  }
+};
+
+const updateNavState = () => {
+  // Clear any existing timeouts
   if (scrollTimeout) {
     window.clearTimeout(scrollTimeout);
   }
-
-  // Set new timeout
+  
   scrollTimeout = window.setTimeout(() => {
-    const currentScrollY = window.scrollY;
+    const currentScrollY = lastScrollY.value;
     
-    // Only update if we've moved significantly from last position
-    if (Math.abs(currentScrollY - lastScrollY.value) < SCROLL_DELTA) return;
-
-    // Add hysteresis to prevent flickering near the threshold
+    // Apply different thresholds based on current state (hysteresis)
     if (isAtTop.value) {
-      // When nav is expanded, require more scroll to collapse
-      if (currentScrollY > TOP_BUFFER + THRESHOLD_BUFFER) {
-        isAtTop.value = false;
+      // When nav is expanded, require more scroll down to collapse
+      if (currentScrollY > TOP_THRESHOLD + HYSTERESIS_BUFFER) {
+        setNavState(false);
       }
     } else {
       // When nav is collapsed, require scrolling almost to top to expand
-      if (currentScrollY < TOP_BUFFER - THRESHOLD_BUFFER) {
-        isAtTop.value = true;
+      if (currentScrollY < TOP_THRESHOLD - HYSTERESIS_BUFFER) {
+        setNavState(true);
       }
     }
-    
-    lastScrollY.value = currentScrollY;
-  }, 10); // Increased debounce time for more stability
+  }, DEBOUNCE_TIME);
 };
 
 
+const setNavState = (atTop) => {
+  if (isAtTop.value === atTop) return;
+  
+  // Lock transitions to prevent multiple state changes during transition
+  transitionInProgress = true;
+  isAtTop.value = atTop;
+  
+  // Allow transitions again after animation completes
+  // Add 50ms buffer to the duration to ensure transition completes
+  if (transitionTimeout) {
+    clearTimeout(transitionTimeout);
+  }
+  
+  transitionTimeout = setTimeout(() => {
+    transitionInProgress = false;
+  }, 250); // Match to your CSS transition duration
+};
+
+let resizeObserver = null;
+
 onMounted(() => {
+  // Use passive listener for better performance
   window.addEventListener('scroll', handleScroll, { passive: true });
-  handleScroll();
+  
+  // Initial state check
+  lastScrollY.value = window.scrollY;
+  isAtTop.value = lastScrollY.value < TOP_THRESHOLD;
+  
+  // Optional: Reset on resize for consistent behavior
+  resizeObserver = new ResizeObserver(() => {
+    // Recalculate state after resize
+    lastScrollY.value = window.scrollY;
+    updateNavState();
+  });
+  
+  resizeObserver.observe(document.documentElement);
 });
 
+// Cleanup on unmount
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  
   if (scrollTimeout) {
     window.clearTimeout(scrollTimeout);
   }
+  
+  if (transitionTimeout) {
+    clearTimeout(transitionTimeout);
+  }
+  
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
 });
 
+// add dynamic route names
 watch(isMenuOpen, (newValue) => {
   document.body.style.overflow = newValue ? 'hidden' : 'auto';
 });
@@ -100,25 +160,28 @@ watch(isMenuOpen, (newValue) => {
   <div class="header-wrapper">
     <nav class="nav-gradient" :class="[
       'w-full top-0 z-[1000]',
-      'transition-[height,padding] cubic-bezier(0.4, 0, 0.2, 1) duration-200',
+      'transition-all duration-200 ease-out',
       isAtTop ? 'h-[140px] pt-4 pb-7 md:py-6 lg:py-6' : 'h-[60px] py-3 md:py-3'
     ]">
       <div class="max-w-screen-xl h-full mx-auto text-white relative z-10 px-4">
         <div class="flex items-center justify-between h-full">
-          <!-- Logo with smooth transitions -->
-          <RouterLink :to="{ name: 'home' }" class="flex items-center gap-1 transition-all duration-300 h-full">
+          <!-- Logo with improved transitions -->
+          <RouterLink :to="{ name: 'home' }" class="flex items-center gap-1 h-full">
             <div class="flex items-center h-full">
               <img
                 :src="isAtTop ? '/src/assets/img/CCS-Logo.svg' : '/src/assets/img/CCS-Logo-lineless.svg'"
                 :class="[
-                  'transition-all duration-300',
+                  'transition-all duration-200 ease-out',
                   isAtTop ? 'w-9 md:w-16 lg:w-16' : 'w-6 md:w-12 lg:w-12'
                 ]"
                 alt="church-logo"
               >
-              <!-- Text with opacity transition -->
-              <div class="flex flex-col justify-center h-full text-start overflow-hidden transition-all duration-300"
-                  :class="isAtTop ? 'max-w-[400px] opacity-100' : 'max-w-0 opacity-0'">
+              <!-- Text with improved transition -->
+              <div class="flex flex-col justify-center h-full text-start overflow-hidden transition-all duration-200 ease-out"
+                   :style="{
+                     maxWidth: isAtTop ? '400px' : '0',
+                     opacity: isAtTop ? '1' : '0',
+                   }">
                 <div class="font-['Cinzel'] whitespace-nowrap lg:text-base">
                   <p class="text-[0.58rem] md:text-base lg:text-lg xl:text-xl leading-tight">
                     COMMUNAUTÉ DE LA
@@ -131,7 +194,7 @@ watch(isMenuOpen, (newValue) => {
             </div>
           </RouterLink>
 
-          <!-- Login component with height inheritance -->
+          <!-- Rest of the components remain the same -->
           <Logout 
             class="h-full flex items-center"
             :is-logged-in="isAuthenticated" 
@@ -140,14 +203,12 @@ watch(isMenuOpen, (newValue) => {
             :loading="authStore.isLoading" 
           />
 
-          <!-- Hamburger Menu Button with height inheritance -->
           <Hamburger 
             class="h-full flex items-center"
             :is-open="isMenuOpen" 
             @toggle="isMenuOpen = !isMenuOpen" 
           />
 
-          <!-- Desktop Navigation with height inheritance -->
           <Desktop 
             class="h-full flex items-center relative z-20"
             v-model="submenuOpen" 
@@ -155,17 +216,15 @@ watch(isMenuOpen, (newValue) => {
           />
         </div>
 
-        <!-- Mobile Navigation -->
         <Mobile 
           :is-menu-open="isMenuOpen" 
-          :header-height="isAtTop ? 88 : 60" 
+          :header-height="isAtTop ? 140 : 60" 
           @close-menu="isMenuOpen = false"
         />
       </div>
     </nav>
   </div>
 </template>
-
 
 <style scoped>
 .header-wrapper {
@@ -176,8 +235,9 @@ watch(isMenuOpen, (newValue) => {
   position: sticky;
   top: -1px; /* Fixes 1px gap at top */
   background-color: #021a21; /* Base dark color */
+  will-change: height, padding, transform;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: height, padding;
+  transform-origin: top;
 }
 
 .nav-gradient::before,
@@ -189,6 +249,12 @@ watch(isMenuOpen, (newValue) => {
   right: 0;
   bottom: 0;
   pointer-events: none;
+}
+
+.nav-gradient {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 
@@ -229,6 +295,8 @@ watch(isMenuOpen, (newValue) => {
 }
 
 :deep(.router-view-container) {
-  margin-top: -1px; /* Fixes 1px gap during transition */
+  margin-top: -1px;
+  position: relative;
+  z-index: 1;
 }
 </style>

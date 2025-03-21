@@ -15,7 +15,7 @@
             <!-- Visual Representation -->
             <div class="mb-2">
               <div v-if="layout.id === 'single'" class="w-16 h-12 bg-gray-300 rounded"></div>
-              <div v-else-if="layout.id === 'twoColumn'" class="flex gap-2">
+              <div v-else-if="layout.id === 'gallary'" class="flex gap-2">
                 <div class="w-10 h-12 bg-gray-300 rounded"></div>
                 <div class="w-4 h-12 bg-gray-300 rounded"></div>
               </div>

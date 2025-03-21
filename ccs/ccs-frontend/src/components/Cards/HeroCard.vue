@@ -5,7 +5,7 @@
       <div class="flex-grow overflow-hidden flex flex-col">
         
         <h1 class="font-bold text-3xl mb-4 relative flex items-center justify-between">
-          <template v-if="isLoading">
+          <template v-if="isCardLoading">
             <div class="h-8 bg-gray-300 rounded-full w-3/4 animate-pulse"></div>
             <div class="h-8 w-8 bg-gray-300 rounded-lg animate-pulse"></div>
           </template>
@@ -25,7 +25,7 @@
 
         <div class="relative flex-grow overflow-hidden">
           <div class="prose prose-preview">
-            <template v-if="isLoading">
+            <template v-if="isCardLoading">
               <!-- Skeleton for body text -->
               <div class="space-y-2 my-10">
                 <div class="h-4 bg-gray-300 rounded-full w-full animate-pulse"></div>
@@ -40,7 +40,7 @@
           </div>
           
           <div class="flex justify-center mt-4">
-            <template v-if="isLoading">
+            <template v-if="isCardLoading">
               <!-- Skeleton for "Learn more" button -->
               <div class="h-10 w-28 bg-gray-300 rounded-lg animate-pulse"></div>
             </template>
@@ -50,7 +50,7 @@
             </a>
           </div>
           
-          <template v-if="isLoading">
+          <template v-if="isCardLoading">
             <!-- Skeleton for edit button -->
             <div class="absolute bottom-2 right-2 h-8 w-8 bg-gray-300 rounded-lg animate-pulse"></div>
           </template>
@@ -72,7 +72,7 @@
       :edit-type="editType"
       :title-value="cardData.title"
       :body-value="cardData.body"
-      :is-loading="isLoading"
+      :is-loading="isCardLoading"
       @update:title="updateTitle"
       @update:body="updateBody"
     />
@@ -101,23 +101,13 @@ const authStore = useAuthStore()
 const contentStore = useContentStore()
 
 const isAuthenticated = computed(() => authStore.checkAuth())
-const isLoading = computed(() => contentStore.isLoading)
+const isCardLoading = computed(() => contentStore.isCardLoading(props.id))
 
 const storeState = computed(() => ({
   cards: contentStore.cards,
   allContent: contentStore.allContent,
-  isLoading: contentStore.isLoading,
   errors: contentStore.errors
 }))
-
-watch(storeState, (newState) => {
-  // console.log('STORE State updated', {
-  //   cards: newState.cards,
-  //   allContent: newState.allContent,
-  //   isLoading: newState.isLoading,
-  //   errors: newState.errors
-  // })
-}, {deep: true})
 
 const cardData = computed(() => {
   const card = contentStore.cards[props.id]
@@ -129,7 +119,7 @@ const editType = ref('')
 const MAX_LENGTH = 340
 
 const shortenBody = computed(() => {
-  if (!cardData.value || !cardData.value.body) return '' 
+  if (!cardData.value || !cardData.value.body) return { text: '', truncated: false } 
   const body = cardData.value.body
   const isTruncated = body.length > MAX_LENGTH 
 
@@ -150,7 +140,7 @@ const updateTitle = async (newTitle) => {
     await contentStore.updateTitle(props.id, newTitle)
     showDialog.value = false
   } catch (error) {
-    alert("ERORR: " + error)
+    console.error(error)
   }
 }
 
@@ -159,7 +149,7 @@ const updateBody = async (newBody) => {
     await contentStore.updateBody(props.id, newBody)
     showDialog.value = false
   } catch (error) {
-    alert("ERORR: " + error)
+    console.error(error)
   }
 }
 
@@ -173,13 +163,12 @@ watch(showDialog, (newVal) => {
 
 onMounted(async () => {
   try {
-    await contentStore.getContent()
+    // Only get content on initial mount
+    if (!Object.values(contentStore.cards).some(card => card.title !== 'Title')) {
+      await contentStore.getContent()
+    }
   } catch (error) {
     console.error('Error fetching content:', error)
   }
 })
 </script>
-
-<style scoped>
-
-</style>

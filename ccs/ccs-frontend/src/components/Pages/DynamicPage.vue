@@ -1,11 +1,10 @@
 <template>
-  <div class="container mx-auto" :class="{ 'px-4 py-8' : !isFullWidthLayout }">
+  <div class="container mx-auto" :class="{ 'px-4 py-8' : isAuthenticated && !isFullWidthLayout }">
     <div v-if="currentSection">
-      <h1 v-if="!hasContent || !hasContentWithHeading" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
+      <h1 v-if="!hasContent || !(typeof pageContent === 'object' && pageContent !== null)" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
      
       <div class="prose max-w-none">
         <slot>
-          <!-- Default content can be customized based on route -->
           <PageEditor v-if="hasContent && (typeof pageContent === 'object' && pageContent !== null)" />
           
           <slot v-else>
@@ -41,7 +40,6 @@ import { useContentStore } from '@/stores/Content';
 import NotFoundView from '@/views/NotFoundView.vue';
 import PageEditor from './PageEditor.vue';
 import { useAuthStore } from '@/stores/Auth';
-import DefaultLayout from "./Layouts/DefaultLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -60,7 +58,7 @@ defineProps({
     }
 });
 
-const fullWidthLayouts = ['default'];
+const fullWidthLayouts = ['default', 'gallarysss'];
 const pageContent = ref({})
 
 const isAuthenticated = computed(() => authStore.checkAuth())
@@ -72,8 +70,11 @@ const hasContent = computed(() => {
 })
 
 const hasContentWithHeading = computed(() => {
-  return pageContent.value?.contents?.content1 && 
+  const result = pageContent.value?.contents?.content1 && 
          pageContent.value.contents.content1.includes('<h1');
+  
+  console.log("This page does have h1 " + result)         
+  return result
 });
 
 const currentSection = computed(() => {

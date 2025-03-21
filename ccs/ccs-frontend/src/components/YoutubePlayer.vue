@@ -134,10 +134,6 @@ const props = defineProps({
     type: String,
     default: 'LATEST SERMONS',
   },
-  // ytURL: {
-  //   type: String,
-  //   default: url
-  // }
 });
 
 const extractVideoID = (url) => {
