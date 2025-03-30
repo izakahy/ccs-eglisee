@@ -96,5 +96,3 @@ export const usePostsStore = defineStore('postsStore', {
         }
     }
 });
-
-// we dont get redirected to to google callback need to fix that 

@@ -16,7 +16,8 @@ export const useContentStore = defineStore('content', {
     isEditing: false,
     isLoading: false,
     isAuthenticated: false,
-    pageContent: {}
+    pageContent: {},
+    lastFetch: null
   }),
 
   actions: {
@@ -144,29 +145,67 @@ export const useContentStore = defineStore('content', {
       }
     },
 
-    // Other methods remain the same
     async loadPageContent() {
       this.isLoading = true;
+      const cacheKey = 'pageContent';
+      const cacheTime = 5 * 60 * 1000; // 5min
+      const now = Date.now();
+
       try {
-        const storedContent = localStorage.getItem('pageContent');
-        if (storedContent) {
-          this.pageContent = JSON.parse(storedContent);
+        // Check localStorage cache first
+        const cachedData = localStorage.getItem(cacheKey);
+        const cachedTimestamp = localStorage.getItem(`${cacheKey}_timestamp`);
+
+        if (cachedData && cachedTimestamp && (now - parseInt(cachedTimestamp) < cacheTime)) {
+          // Use cached data if it’s fresh
+          this.pageContent = JSON.parse(cachedData);
+          this.lastFetch = parseInt(cachedTimestamp);
+        } else {
+          // Fetch from API if cache is stale or missing
+          const response = await api.get('/api/page-contents');
+          const pageData = {};
+          response.data.forEach(item => {
+            pageData[item.path] = item.content;
+          });
+          this.pageContent = pageData;
+          this.lastFetch = now;
+
+          // Update cache
+          localStorage.setItem(cacheKey, JSON.stringify(this.pageContent));
+          localStorage.setItem(`${cacheKey}_timestamp`, now.toString());
         }
       } catch (error) {
-        console.error("Failed to load content: ", error);
+        console.error('Failed to load page content:', error);
+        this.errors = error.response?.data?.message || 'Failed to load page content';
+        // Fallback to cached data if available, even if stale
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          this.pageContent = JSON.parse(cachedData);
+        }
       } finally {
         this.isLoading = false;
       }
     },
 
     async saveContent(path, content) {
+      debugger
       this.isLoading = true;
       try {
-        this.pageContent[path] = content;
-        localStorage.setItem('pageContent', JSON.stringify(this.pageContent));
+        // Update backend
+        const response = await api.put(`/api/page-contents${path}`, { content });
+        // Store the content in the format expected by the frontend
+        this.pageContent[path] = content; 
+
+        // Update cache
+        const cacheKey = 'pageContent';
+        localStorage.setItem(cacheKey, JSON.stringify(this.pageContent));
+        localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+
+        this.errors = [];
         return true;
       } catch (error) {
         console.error('Failed to save content:', error);
+        this.errors = error.response?.data?.message || 'Failed to save content';
         return false;
       } finally {
         this.isLoading = false;
@@ -176,16 +215,46 @@ export const useContentStore = defineStore('content', {
     async deleteContent(path) {
       this.isLoading = true;
       try {
+        await api.delete(`/api/page-contents${path}`);
         if (this.pageContent[path]) {
           delete this.pageContent[path];
-          localStorage.setItem('pageContent', JSON.stringify(this.pageContent));
         }
+
+        // Update cache
+        const cacheKey = 'pageContent';
+        localStorage.setItem(cacheKey, JSON.stringify(this.pageContent));
+        localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+
+        this.errors = [];
         return true;
       } catch (error) {
         console.error('Failed to delete content:', error);
+        this.errors = error.response?.data?.message || 'Failed to delete content';
         return false;
       } finally {
         this.isLoading = false;
+      }
+    },
+
+    async toggleEditMode() {
+      this.isEditing = !this.isEditing;
+    },
+
+    // Optional: Fetch specific page content if not in cache
+    async fetchPageContent(path) {
+      try {
+        const response = await api.get(`/api/page-contents${path}`);
+        const content = response.data.content || '';
+        this.pageContent[path] = content;
+        // Update cache
+        const cacheKey = 'pageContent';
+        localStorage.setItem(cacheKey, JSON.stringify(this.pageContent));
+        localStorage.setItem(`${cacheKey}_timestamp`, Date.now().toString());
+        return content;
+      } catch (error) {
+        console.error(`Failed to fetch content for ${path}:`, error);
+        this.errors = error.response?.data?.message || `Failed to fetch content for ${path}`;
+        return '';
       }
     },
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto" :class="{ 'px-4 py-8' : isAuthenticated && !isFullWidthLayout }">
+  <div class="mx-auto" :class="{ 'px-4 py-8' : isAuthenticated && !isFullWidthLayout }">
     <div v-if="currentSection">
       <h1 v-if="!hasContent || !(typeof pageContent === 'object' && pageContent !== null)" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
      
