@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="md:hidden fixed z-10 right-0 w-full nav-gradient-mobile overflow-y-auto transform transition-transform duration-300 ease-in-out"
+    class="lg:hidden fixed z-10 right-0 w-full nav-gradient-mobile overflow-y-auto transform transition-transform duration-300 ease-in-out"
     :style="{ 
       top: headerHeight + 'px',
       height: `calc(100dvh - ${headerHeight}px)`

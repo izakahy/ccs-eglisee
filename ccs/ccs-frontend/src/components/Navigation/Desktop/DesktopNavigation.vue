@@ -1,13 +1,13 @@
 <template>
-  <ul :class="['hidden lg:flex space-x-2 text-2xl', $attrs.class]">
+  <ul :class="['hidden lg:flex space-x-2', locale === 'en' ? 'text-2xl' : 'text-[1.3rem]',  $attrs.class]">
     <template v-for="(section, key) in navStore.routes" :key="key">
       <DropdownMenuItem
         class="hover:text-[#e7dfdf] transition-all ease-in-out"
         v-if="dropdownStates[key] !== undefined"
-        :label="section.label"
+        :label="$te(`navigation.${section.label}`) ? $t(`navigation.${section.label}`) : section.label"
         :href="section.path"
         :is-open="dropdownStates[key]"
-        :items="section.items"
+        :items="translateItems(section.items)"
         :section-key="key"
         @update:is-open="(value) => HandleDropdownToggle(key, value)"
       >
@@ -17,7 +17,7 @@
           class="px-6 pt-1 pb-6 space-y-4 border-t bg-gradient-to-r from-gray-900 to-stone-900 border-gray-400 mt-4 w-full max-w-2xl mx-auto rounded-xl shadow-md"
         >
           <div class="mb-4">
-            <p class="text-sm text-gray-300 font-semibold text-center">Add/Edit Section</p>
+            <p class="text-sm text-gray-300 font-semibold text-center">{{ $t('addEditSection')}}</p>
           </div>
           <div class="flex items-center justify-between gap-2 mb-4 border-b border-gray-400 pb-4">
             <div class="flex-1">
@@ -25,10 +25,10 @@
                 v-if="editingSectionKey === key"
                 :disabled="loadingStates.updateSection"
                 v-model="editingSectionLabel"
-                :placeholder="section.label"
+                :placeholder="$t('inputPlaceholders.sectionLabel')"
                 class="px-2 py-2 bg-gray-50 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
-              <span v-else class="text-white text-xl">{{ section.label }}</span>
+              <span v-else class="text-white text-xl">{{ translateText(`navigation.${section.label}`, section.label) }}</span>
             </div>
             <div class="flex gap-2">
               <button
@@ -80,12 +80,12 @@
             </div>
           </div>
           <div class="">
-            <p class="text-sm text-gray-300 font-semibold text-center">Add/Edit Form</p>
+            <p class="text-sm text-gray-300 font-semibold text-center">{{ $t('addEditForm') }}</p>
           </div>
           <div class="flex gap-2">
             <input
               v-model="newItem.label"
-              placeholder="Label (ex: 'story' or 'mission')"
+              :placeholder="$t('inputPlaceholders.itemLabel')"
               class="px-2 py-2 bg-gray-50 border border-gray-300 rounded-lg text-base text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-200 ease-in-out"
               :disabled="editingIndex !== -1 && loadingStates.updateItem !== null"
             >
@@ -112,8 +112,8 @@
           </div>
           <!-- Items List -->
           <div v-for="(item, index) in section.items" :key="index" class="flex items-center gap-2">
-            <span class="flex-1 text-sm text-white">{{ item.label }}</span>
-            <RouterLink :to="item.path">{{ item.label }}</RouterLink>
+            <span class="flex-1 text-sm text-white">{{ translateText(`items.${item.label}`, item.label) }}</span>
+            <RouterLink :to="item.path">{{ translateText(`items.${item.label}`, item.label) }}</RouterLink>
             <button
               title="Update"
               @click="editingIndex = index; newItem = { label: item.label }"
@@ -140,14 +140,28 @@
         </div>
       </DropdownMenuItem>
     </template>
-    <DropdownMenuItem
+    <!-- <DropdownMenuItem
       label="SOCIALS"
       href="#"
       :items="socialItems"
       :is-open="dropdownStates.social"
       section-key="social"
       @update:is-open="(value) => HandleDropdownToggle('social', value)"
-    />
+    /> -->
+
+    <div class="relative text-sm">
+    <button 
+      @click="toggleLanguage" 
+      class="flex items-center space-x-2 px-3 text-white bg-transparent hover:bg-blue-600 rounded-lg transition-all duration-200 ease-in-out"
+      :title="locale === 'en' ? 'Switch to French' : 'Switch to English'"
+    >
+      <i class="fa-solid fa-language text-xl"></i>
+      <span>{{ locale === 'en' ? 'EN' : 'FR' }}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+  </div>
     <!-- Add Section Form -->
     <div v-if="isAuthenticated" class="items-center">
       <div v-if="isAddingSectionMode" class="flex gap-2 items-center">
@@ -198,11 +212,17 @@ import { PencilSquareIcon, PencilIcon, TrashIcon, PlusIcon, XMarkIcon } from '@h
 import { useNavigationStore } from '@/stores/NavItems/Navigation';
 import { addDynamicRoutes } from '@/router';
 import DynamicPage from '@/components/Pages/DynamicPage.vue';
+import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
 
 const navStore = useNavigationStore();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
+const { t, locale } = useI18n();
+const { currentLocale, toggleLanguage, translateText } = useLanguage()
+
+
 const newItem = ref({ label: '' });
 const editingIndex = ref(-1);
 const isAddingSectionMode = ref(false);
@@ -224,6 +244,14 @@ const loadingStates = reactive({
 
 // Loading message state
 const loadingMessage = ref('Loading...');
+
+// const toggleLanguage = () => {
+//   // Switch between English and French using the i18n composable
+//   locale.value = locale.value === 'en' ? 'fr' : 'en';
+//   // Store user preference
+//   localStorage.setItem('userLanguage', locale.value);
+// };
+
 
 // Computed property for global loading state
 const isGlobalLoading = computed(() => {
@@ -438,6 +466,16 @@ const handleAddSection = async () => {
   }
 };
 
+
+const translateItems = (items) => {
+  if (!items) return [];
+  
+  return items.map(item => ({
+    ...item,
+    label: t(`items.${item.label}`, item.label) 
+  }));
+};
+
 defineProps({
   modelValue: {
     type: Object,
@@ -452,6 +490,11 @@ defineProps({
 defineEmits(['update:modelValue']);
 
 onMounted(async () => {
+  const savedLanguage = localStorage.getItem('userLanguage');
+  if (savedLanguage) {
+    locale.value = savedLanguage;
+  }
+  
   loadingStates.initialLoad = true;
   loadingMessage.value = "Loading navigation...";
   

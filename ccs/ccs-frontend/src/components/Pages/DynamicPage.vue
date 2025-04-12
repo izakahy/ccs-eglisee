@@ -41,6 +41,7 @@ import NotFoundView from '@/views/NotFoundView.vue';
 import PageEditor from './PageEditor.vue';
 import { useAuthStore } from '@/stores/Auth';
 
+
 const route = useRoute();
 const router = useRouter();
 const navStore = useNavigationStore();

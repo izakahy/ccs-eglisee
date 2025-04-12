@@ -1,0 +1,63 @@
+{
+  "welcome": "Bienvenue",
+  "serviceTimes": "temps de service",
+  "address": "58, RUE FESTIVAL, SHEDIAC, NB E4P IS4",
+  "learnMore": "Apprendre encore plus",
+  "latestSermons": "DERNIERS SERMONS",
+  "ytUrlPlaceholder": "Saisissez l'URL YouTube",
+  "updateVideo": "Mettre à jour la vidéo",
+  "switchLanguage": "Passer à l'anglais",
+  "addEditSection": "Ajouter/Modifier une section",
+  "addEditForm": "Ajouter/Modifier un formulaire",
+  "loading": "Chargement...",
+  "updating": "Mise à jour...",
+  "about": "À propos de nous",
+  "contact": "Contactez-nous",
+  "navigation": {
+      "ABOUT": "À PROPOS",
+      "CONNECT": "CONNECTER",
+      "GALLERY": "GALERIE",
+      "GIVE": "DONNER",
+      "NEW": "NOUVEAU",
+      "X": "X"
+  },
+  "items": {
+      "Our Story": "Notre Histoire",
+      "Mission": "Mission",
+      "Team": "Équipe",
+      "House Fellowship": "Communion à Domicile",
+      "Conversation Sundays": "Conversations du Dimanche",
+      "Member": "Membre",
+      "ss": "ss",
+      "Donate": "Faire un Don",
+      "Update": "Actualiser",
+      "e": "e",
+      "sssss": "sssss",
+      "i": "i",
+      "b": "b"
+    },
+    "invitationCard": {
+      "title": {
+          "aboutPastor": "À PROPOS DU PASTEUR",
+          "houseFellowships": "Bourses de maison",
+          "upcomingEvents": "ÉVÉNEMENTS À VENIR"
+      }
+  },
+  "footer": {
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité"
+  },
+  "inputPlaceholders": {
+    "itemLabel": "Libellé (ex: 'histoire' ou 'mission')",
+    "sectionLabel": "Libellé de section (ex: 'SERVICES')"
+  },
+  "confirmations": {
+    "deleteSection": "Êtes-vous sûr de vouloir supprimer cette section? Cela supprimera tous les éléments qu'elle contient.",
+    "deleteItem": "Êtes-vous sûr de vouloir supprimer cet élément?"
+  },
+  "alerts": {
+    "emptyLabel": "Veuillez saisir un libellé.",
+    "duplicateLabel": "Ce libellé existe déjà. Veuillez choisir un libellé unique.",
+    "emptySectionLabel": "Veuillez saisir un libellé de section"
+  }
+}

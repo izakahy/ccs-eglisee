@@ -2,7 +2,7 @@
     <div :class="containerClass">
       <!-- Type 1: Simple Content Card -->
       <div v-if="type === 'content'" class="flex flex-col justify-evenly ps-3 min-h-[300px] md:min-h-[380px] lg:min-h-[510px]">
-        <h1  id="about"  class="h-about-pastor" :class="titleClass">{{ title }}</h1>
+        <h1  id="about" class="h-about-pastor" :class="titleClass">{{ translateText('invitationCard.title.aboutPastor', title) }}</h1>
         
         <div class="pl-0 p-2">
           <slot></slot>
@@ -10,7 +10,7 @@
         
         <div v-if="showButton" class="text-center lg:text-start transition duration-500 ease-in-out">
           <button class="btn-primary">
-            {{ buttonText }}
+            {{ translateText('learnMore', buttonText ) }}
           </button>
         </div>
       </div>
@@ -42,6 +42,12 @@
   </template>
   
   <script setup>
+import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
+
+const { t, te, locale } = useI18n();
+const { currentLocale, toggleLanguage, translateText } = useLanguage()
+
   defineProps({
     type: {
       type: String,

@@ -7,7 +7,11 @@ import MainCard from '@/components/Cards/MainCard.vue';
 import InfoCard from '@/components/Cards/InfoCard.vue';
 import { XMarkIcon } from '@heroicons/vue/24/solid'
 import { useAuthStore } from '@/stores/Auth';
+import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
 
+const { t, te, locale } = useI18n();
+const { currentLocale, toggleLanguage, translateText } = useLanguage()
 const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.checkAuth())
 
@@ -88,7 +92,7 @@ const removeCard = (index) => {
           <template #highlight-content>
             <a class="group relative" href="#">
               <p class="text-center text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl pop-up-a">
-                HOUSE FELLOWSHIPS
+                {{ translateText('invitationCard.title.houseFellowships', 'HOUSE FELLOWSHIPS')}}
               </p>
               <span class="s-highlight"></span>
             </a>
@@ -104,7 +108,7 @@ const removeCard = (index) => {
         <template #highlight-content>
           <a class="group relative" href="#">
             <p class="text-center text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl pop-up-a">
-              UPCOMING EVENTS
+              {{ translateText('invitationCard.title.upcomingEvents', 'UPCOMING EVENTS') }}
             </p>
             <span class="s-highlight"></span>
           </a>

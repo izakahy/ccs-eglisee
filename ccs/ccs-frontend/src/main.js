@@ -7,6 +7,7 @@ import { useAuthStore } from './stores/Auth'
 import App from './App.vue'
 import router, { addDynamicRoutes, initializeRouter } from './router'
 import { useNavigationStore } from './stores/NavItems/Navigation'
+import i18n from './language/i18n'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -19,6 +20,8 @@ pinia.use(({ store }) => {
 
 app.use(pinia)
 app.use(router)
+app.use(i18n);
+
 
 // Initialize app
 async function startApp() {
