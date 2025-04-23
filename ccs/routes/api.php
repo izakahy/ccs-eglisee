@@ -22,7 +22,10 @@ Route::prefix('auth')->group(function () {
 // Public routes
 Route::get('yt-urls/{yTPlayer}', [YTPlayerController::class, 'show']);
 Route::get('contents/{content}', [ContentController::class, 'show']);
+Route::get('contents', [ContentController::class, 'index']);
 Route::get('sections/{section}', [NavSectionController::class, 'show']);
+Route::get('posts', [PostController::class, 'index']);
+Route::get('posts/{post}', [PostController::class, 'show']);
 Route::get('sections', [NavSectionController::class, 'index']);
 Route::get('items', [NavItemController::class, 'show']);
 Route::get('page-contents', [PageContentController::class, 'index']); 
@@ -39,12 +42,13 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Posts resource routes
-    Route::apiResource('posts', PostController::class);
+    Route::apiResource('posts', PostController::class)
+        ->except('index', 'show');
     Route::apiResource('yt-urls', YTPlayerController::class)
         ->parameters(['yt-urls' => 'yTPlayer'])
         ->except(['show']);
     Route::apiResource('contents', ContentController::class)
-        ->except('show');
+        ->except('index', 'show');
     Route::apiResource('sections', NavSectionController::class)
         ->except('index','show');
     Route::apiResource('items', NavItemController::class)

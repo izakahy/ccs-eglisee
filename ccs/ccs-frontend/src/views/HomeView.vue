@@ -10,10 +10,14 @@ import { useAuthStore } from '@/stores/Auth';
 import { useI18n } from 'vue-i18n';
 import { useLanguage } from '@/composables/useLanguage';
 
-const { t, te, locale } = useI18n();
+const i18n = useI18n();
+
+const { t, te} = useI18n();
 const { currentLocale, toggleLanguage, translateText } = useLanguage()
 const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.checkAuth())
+
+const locale = computed(() => i18n.locale.value);
 
 const cardData = ref([
   { id: 'card1', bgColor: 'bg-[#2f9260]'},
@@ -87,11 +91,11 @@ const removeCard = (index) => {
         type="image-card"
         image="https://media.istockphoto.com/id/623901114/photo/real-friends-are-there-when-you-need-them.jpg?s=612x612&w=0&k=20&c=8xuB03fm7Kw7f0xTsx32ZoqF-6v6cvOT1uORy8q3Tho="
         image-alt="Fellowship image"
-        content-class="bg-blue-50 p-8 sm:p-16 md:p-32 lg:p-48"
+         :content-class="locale === 'en' ? 'p-8 sm:p-16 md:p-32 lg:p-48' : 'p-6 sm:p-12 md:p-24 lg:p-47'"
         >
           <template #highlight-content>
             <a class="group relative" href="#">
-              <p class="text-center text-white font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl pop-up-a">
+              <p :class="['text-center text-white font-bold text-2xl sm:text-3xl md:text-4xl xl:text-6xl pop-up-a', locale === 'en' ? 'lg:text-5xl' : 'lg:text-7xl']">
                 {{ translateText('invitationCard.title.houseFellowships', 'HOUSE FELLOWSHIPS')}}
               </p>
               <span class="s-highlight"></span>

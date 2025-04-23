@@ -1,6 +1,8 @@
 {
     "welcome": "Welcome",
     "serviceTimes": "service times",
+    "sundayService": "Sunday Service",
+    "joinUs": "Join Us Sunday at 10:00 AM",
     "address": "58 FESTIVAL STREET, SHEDIAC, NB E4P IS4",
     "learnMore": "Learn More",
     "latestSermons": "LATEST SERMONS",
@@ -13,13 +15,17 @@
     "updating": "Updating...",
     "about": "About Us",
     "contact": "Contact",
+    "contactUs": "Contact Us",
+    "nextService":"Next service in",
+    "connectWithUs": "Connect With Us",
+    "everySunday": "Every Sunday",
     "navigation": {
         "ABOUT": "ABOUT",
         "CONNECT": "CONNECT",
         "GALLERY": "GALLERY",
         "GIVE": "GIVE",
         "NEW": "NEW",
-        "X": "X"
+        "X": "X" 
     },
     "items": {
         "Our Story": "Our Story",
@@ -28,13 +34,9 @@
         "House Fellowship": "House Fellowship",
         "Conversation Sundays": "Conversation Sundays",
         "Member": "Member",
-        "ss": "ss",
         "Donate": "Donate",
         "Update": "Update",
-        "e": "e",
-        "sssss": "sssss",
-        "i": "i",
-        "b": "b"
+        "sssss": "sssss"
     },
     "invitationCard": {
         "title": {
@@ -42,6 +44,15 @@
             "houseFellowships": "HOUSE FELLOWSHIPS",
             "upcomingEvents": "UPCOMING EVENTS"
         }
+    },
+    "toolTipMsg": {
+        "close": "Close"
+    },
+    "time": {
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s"
     },
     "footer": {
         "terms": "Terms of Service",

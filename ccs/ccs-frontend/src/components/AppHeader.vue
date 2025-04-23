@@ -7,6 +7,7 @@ import Mobile from './Navigation/Mobile/Mobile.vue';
 import Hamburger from './Navigation/Mobile/HamburgerMenu.vue';
 import Desktop from './Navigation/Desktop/DesktopNavigation.vue';
 import { useAboutStore } from '@/stores/NavItems/About';
+import CountdownBanner from './Cards/CountdownBanner.vue';
 
 const authStore = useAuthStore();
 const aboutStore = useAboutStore();
@@ -150,7 +151,6 @@ onUnmounted(() => {
   }
 });
 
-// add dynamic route names
 watch(isMenuOpen, (newValue) => {
   document.body.style.overflow = newValue ? 'hidden' : 'auto';
 });
@@ -158,6 +158,7 @@ watch(isMenuOpen, (newValue) => {
 
 <template>
   <div class="header-wrapper">
+    <CountdownBanner :persist-closed="false"/>
     <nav class="nav-gradient" :class="[
       'w-full top-0 z-[1000]',
       'transition-all duration-200 ease-out',
@@ -194,7 +195,6 @@ watch(isMenuOpen, (newValue) => {
             </div>
           </RouterLink>
 
-          <!-- Rest of the components remain the same -->
           <Logout 
             class="h-full flex items-center"
             :is-logged-in="isAuthenticated" 

@@ -11,7 +11,6 @@
         :section-key="key"
         @update:is-open="(value) => HandleDropdownToggle(key, value)"
       >
-        <!-- Admin Controls (outside regular items) -->
         <div
           v-if="isAuthenticated"
           class="px-6 pt-1 pb-6 space-y-4 border-t bg-gradient-to-r from-gray-900 to-stone-900 border-gray-400 mt-4 w-full max-w-2xl mx-auto rounded-xl shadow-md"
@@ -110,7 +109,6 @@
               <PencilSquareIcon v-else class="w-5 h-5" />
             </button>
           </div>
-          <!-- Items List -->
           <div v-for="(item, index) in section.items" :key="index" class="flex items-center gap-2">
             <span class="flex-1 text-sm text-white">{{ translateText(`items.${item.label}`, item.label) }}</span>
             <RouterLink :to="item.path">{{ translateText(`items.${item.label}`, item.label) }}</RouterLink>
@@ -162,7 +160,6 @@
       </svg>
     </button>
   </div>
-    <!-- Add Section Form -->
     <div v-if="isAuthenticated" class="items-center">
       <div v-if="isAddingSectionMode" class="flex gap-2 items-center">
         <input
@@ -231,7 +228,6 @@ const editingSectionLabel = ref('');
 const dropdownStates = reactive({});
 const newSection = reactive({ label: '' });
 
-// Loading states
 const loadingStates = reactive({
   addSection: false,
   deleteSection: null, 
@@ -242,18 +238,8 @@ const loadingStates = reactive({
   initialLoad: !navStore.initialized
 });
 
-// Loading message state
 const loadingMessage = ref('Loading...');
 
-// const toggleLanguage = () => {
-//   // Switch between English and French using the i18n composable
-//   locale.value = locale.value === 'en' ? 'fr' : 'en';
-//   // Store user preference
-//   localStorage.setItem('userLanguage', locale.value);
-// };
-
-
-// Computed property for global loading state
 const isGlobalLoading = computed(() => {
   return !navStore.initialized && loadingStates.initialLoad;
 });
@@ -374,7 +360,6 @@ const handleUpdateSection = async (sectionKey) => {
     
     editingSectionKey.value = null;
     editingSectionLabel.value = '';
-    // Update routes
     addDynamicRoutes();
   } catch (error) {
     showAlert(error.message, sectionKey);
@@ -437,7 +422,6 @@ const handleAddSection = async () => {
     return;
   }
   
-  // Generate the section key from the label
   const sectionKey = newSection.label
     .toLowerCase()
     .trim()
@@ -452,11 +436,9 @@ const handleAddSection = async () => {
       component: markRaw(DynamicPage)
     });
     
-    // Reset form
     newSection.label = '';
     isAddingSectionMode.value = false;
     
-    // Update routes
     addDynamicRoutes();
   } catch (error) {
     console.error(error.message);
@@ -515,7 +497,6 @@ watch(routeKeys, (newKeys) => {
       dropdownStates[key] = false;
     }
   });
-  // Remove old keys
   Object.keys(dropdownStates).forEach(key => {
     if (!newKeys.includes(key)) {
       delete dropdownStates[key];

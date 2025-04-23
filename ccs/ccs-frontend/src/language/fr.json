@@ -1,6 +1,8 @@
 {
   "welcome": "Bienvenue",
   "serviceTimes": "temps de service",
+  "sundayService": "Service du dimanche",
+  "joinUs": "Joignez-vous à nous dimanche à 10 h 00",
   "address": "58, RUE FESTIVAL, SHEDIAC, NB E4P IS4",
   "learnMore": "Apprendre encore plus",
   "latestSermons": "DERNIERS SERMONS",
@@ -12,7 +14,11 @@
   "loading": "Chargement...",
   "updating": "Mise à jour...",
   "about": "À propos de nous",
-  "contact": "Contactez-nous",
+  "contact": "Contactez",
+  "contactUs": "Contactez-nous",
+  "nextService":"Prochain culte dans",
+  "connectWithUs": "Connectez-vous avec nous",
+  "everySunday": "Chaque dimanche",
   "navigation": {
       "ABOUT": "À PROPOS",
       "CONNECT": "CONNECTER",
@@ -43,6 +49,15 @@
           "upcomingEvents": "ÉVÉNEMENTS À VENIR"
       }
   },
+  "toolTipMsg": {
+      "close": "Fermer"
+  },
+  "time": {
+        "days": "j",
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "s"
+    },
   "footer": {
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité"

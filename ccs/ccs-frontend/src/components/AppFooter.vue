@@ -1,50 +1,91 @@
 <script setup>
-import { PhoneIcon, EnvelopeIcon, ClockIcon, UserIcon } from '@heroicons/vue/24/outline'
-import { RouterLink } from 'vue-router';
+import { PhoneIcon, EnvelopeIcon, ClockIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/Auth';
+import { ref, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
 
+
+const { t, locale } = useI18n();
+const { currentLocale, toggleLanguage, translateText } = useLanguage()
 const authStore = useAuthStore();
+const isLoggedIn = ref(false);
+const currentYear = new Date().getFullYear();
+
+onMounted(() => {
+  isLoggedIn.value = authStore.checkAuth();
+});
+
 
 const handleLogin = () => {
-  if (authStore.checkAuth()) {
-    alert("You are already logged in")
-    return
-  }
   authStore.googleLogin();
 }
 </script>
 
 <template>
-  <footer class="nav-gradient w-full p-8 text-gray-100">
-    <div class="max-w-screen-xl mx-auto grid grid-rows-1 md:grid-rows-2 lg:grid-rows-4 gap-6">
-      <div class="flex items-center space-x-3">
-        <PhoneIcon class="h-5 w-5" />
-        <p>506-588-7802</p>
-      </div>
-      
-      <div class="flex items-center space-x-3">
-        <EnvelopeIcon class="h-5 w-5" />
-        <a href="mailto:INFO@CCS-EGLISE.ORG" class="hover:text-white transition-colors">INFO@CCS-EGLISE.ORG</a>
-      </div>
-      
-      <div class="flex items-center space-x-3">
-        <ClockIcon class="h-5 w-5" />
-        <p>Every Sunday</p>
-      </div>
-
-      <div class="flex flex-col lg:flex-row md:justify-between lg:justify-between md:items-center lg:items-center text-gray-200 transition-all duration-500 ease-in-out">
-        <div class="flex items-center space-x-2">
-          <UserIcon class="h-5 w-5" />
-          <a
-          type="button" @click="handleLogin"
-          class="text-gray-400 hover:text-white cursor-pointer active:text-yellow-300 active:font-bold transition duration-300">
-              <p class="text-sm truncate">Admin</p>
-          </a>  
-        </div>
-        <div class="">
-          <p class="text-start md:text-end lg:text-end text-xs m-0">
-            &copy; {{ new Date().getFullYear() }} Communauté De La Compassion, Shediac
+  <footer class="nav-gradient w-full py-12 text-gray-100">
+    <div class="max-w-screen-xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-10">
+        <!-- <div>
+          <h3 class="text-white font-semibold text-lg mb-4">Communauté De La Compassion</h3>
+          <p class="text-gray-300 text-sm leading-relaxed">
+            Lorem ipsum dolor sit amet consectetur. Vitae vitae amet nunc orci sit pharetra adipiscing
           </p>
+        </div> -->
+        
+        <div>
+          <h3 class="text-white font-semibold text-lg mb-4">{{ translateText('contactUs', 'Contact Us')}}</h3>
+          <div class="space-y-3">
+            <div class="flex items-center space-x-3 group">
+              <PhoneIcon class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
+              <p class="text-gray-300 group-hover:text-white transition-colors">506-588-7802</p>
+            </div>
+            
+            <div class="flex items-center space-x-3 group">
+              <EnvelopeIcon class="h-5 w-5 text-gray-400 group-hover:text-white transition-colors" />
+              <a href="mailto:INFO@CCS-EGLISE.ORG" class="text-gray-300 group-hover:text-white transition-colors">
+                INFO@CCS-EGLISE.ORG
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold text-lg mb-4">{{ translateText('serviceTimes', 'Service Times') }}</h3>
+          <div class="flex items-center space-x-3">
+            <ClockIcon class="h-5 w-5 text-gray-400" />
+            <p class="cursor-pointer text-gray-300 hover:text-white transition-colors">{{ translateText('everySunday', 'Every Sunday')}}</p>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-white font-semibold text-lg mb-4">{{ translateText('connectWithUs', 'Connect With Us')}}</h3>
+          <div class="flex space-x-4 mb-4">
+            <a href="https://www.youtube.com/@CommunauteCompassionShediac" 
+              target="_blank"
+               class="text-gray-400 hover:text-[#FF0000] transition-colors">
+              <i class="fa-brands fa-youtube text-3xl hover:-translate-y-1 transition-all ease-in-out"></i>
+            </a>
+            <a href="https://www.facebook.com/@CommunauteCompassionShediac"
+              target="_blank" 
+               class="text-gray-400 hover:text-[#1877F2] transition-colors">
+              <i class="fa-brands fa-facebook text-3xl hover:-translate-y-1 transition-all ease-in-out"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pt-6 border-t border-gray-800">
+        <div class="flex flex-col items-center text-center sm:text-left sm:items-start">
+          <p class="text-gray-400 text-sm mb-2">
+            &copy; {{ currentYear }} Communauté De La Compassion, Shediac
+          </p>
+          <a 
+            @click="handleLogin" 
+            class="text-gray-500 text-xs hover:text-gray-400 cursor-pointer transition-colors"
+          >
+            Admin
+          </a>
         </div>
       </div>
     </div>

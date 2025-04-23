@@ -10,7 +10,8 @@
       </div>  
       
       <!-- Main Content/Description Area -->
-      <div v-if="contents.content1" class="max-w-3xl mx-auto">
+      <div v-if="contents.content1 && contents.content1.replace(/<[^>]*>/g, '').trim() !== ''" class="max-w-3xl mx-auto">
+        <span>{{ console.log() }}</span>
         <div v-html="contents.content1" class="editor-content prose lg:prose-xl mx-auto"></div>
       </div>
     </div>
