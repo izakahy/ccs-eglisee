@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { markRaw } from "vue";
 import DynamicPage from "@/components/Pages/DynamicPage.vue";
 import { api } from "../Auth";
+import i18n from "@/language/i18n";
+import { addDynamicRoutes } from "@/router";
 
 export const useNavigationStore = defineStore('navigation', {
     state: () => {
@@ -17,7 +19,7 @@ export const useNavigationStore = defineStore('navigation', {
             const parsedData = JSON.parse(savedData);
             if (parsedData.routes && parsedData.lastFetch) {
               routes = parsedData.routes;
-              // Reattach the component reference since it’s not serializable
+              // Reattach the component reference since it's not serializable
               Object.values(routes).forEach(section => {
                 section.component = markRaw(DynamicPage);
               });
@@ -49,35 +51,38 @@ export const useNavigationStore = defineStore('navigation', {
           const now = Date.now();
           const cacheTime = 5 * 60 * 1000; // 5 minutes
 
-          // Use cached data if available and not stale
           if (this.initialized && this.lastFetch && (now - this.lastFetch < cacheTime)) {
-            console.log('Using cached navigation data');
             setTimeout(() => {
               this.isLoading = false;
             }, 300)
             return this.routes;
           }
 
-          // Fetch fresh data from the backend
           try {
             const response = await api.get('/api/sections');
-            console.log("API response data:", response.data);
             const sectionsData = response.data;
 
             this.routes = {};
 
-            // Transform backend data into routes
             Object.entries(sectionsData).forEach(([sectionKey, section]) => {
+              const sectionLabel = this.translateNavItem(`navigation.${section.label}`, section.label);
+              
               this.routes[sectionKey] = {
                 id: section.id,
                 path: `/${sectionKey}`,
                 label: section.label,
+                translatedLabel: sectionLabel,
                 component: markRaw(DynamicPage),
-                items: section.items.map(item => ({
-                  id: item.id,
-                  label: item.label,
-                  path: item.path
-                }))
+                items: section.items.map(item => {
+                  const itemLabel = this.translateNavItem(`items.${item.label}`, item.label);
+                  
+                  return {
+                    id: item.id,
+                    label: item.label,
+                    translatedLabel: itemLabel,
+                    path: item.path
+                  };
+                })
               };
             });
 
@@ -95,6 +100,11 @@ export const useNavigationStore = defineStore('navigation', {
           }
         },
 
+        // Helper method to translate navigation items
+        translateNavItem(key, fallback) {
+          return i18n.global.te(key) ? i18n.global.t(key) : fallback;
+        },
+
         restoreFromSession() {
           try {
             this.isLoading = true;
@@ -106,6 +116,16 @@ export const useNavigationStore = defineStore('navigation', {
                 // Restore component references for each section
                 Object.values(parsedData.routes).forEach(section => {
                   section.component = markRaw(DynamicPage);
+                  
+                  // Ensure translations are up to date after restore
+                  section.translatedLabel = this.translateNavItem(`navigation.${section.label}`, section.label);
+                  
+                  // Update translations for items
+                  if (section.items) {
+                    section.items.forEach(item => {
+                      item.translatedLabel = this.translateNavItem(`items.${item.label}`, item.label);
+                    });
+                  }
                 });
                 
                 this.routes = parsedData.routes;
@@ -136,11 +156,15 @@ export const useNavigationStore = defineStore('navigation', {
                 label: config.label
               });
 
+             // Translate the section label
+             const translatedLabel = this.translateNavItem(`navigation.${config.label}`, config.label);
+             
              // add a new section
              this.routes[sectionKey] = {
                  id: response.data.id,
                  path: `/${sectionKey}`,
                  label: config.label,
+                 translatedLabel: translatedLabel,
                  component: markRaw(config.component || DynamicPage),
                  items: []
              }
@@ -172,9 +196,13 @@ export const useNavigationStore = defineStore('navigation', {
              });
 
              const fullPath = `/${sectionKey}/${generatedPath}`;
+             // Translate the item label
+             const translatedLabel = this.translateNavItem(`items.${item.label}`, item.label);
+             
              this.routes[sectionKey].items.push({
                  id: response.data.id,
                  label: item.label,
+                 translatedLabel: translatedLabel,
                  path: fullPath
              });
              this.syncCache();
@@ -201,10 +229,14 @@ export const useNavigationStore = defineStore('navigation', {
               label: updatedSection.label,
             })
             
+            // Translate the updated section label
+            const translatedLabel = this.translateNavItem(`navigation.${updatedSection.label}`, updatedSection.label);
+            
             const existingItems = section.items
             this.routes[sectionkey] = {
               ...section,
               label: updatedSection.label,
+              translatedLabel: translatedLabel,
               items: updatedSection.items || existingItems,
             }
             this.syncCache();
@@ -242,11 +274,15 @@ export const useNavigationStore = defineStore('navigation', {
               path: generatedPath
             });
 
+            // Translate the updated item label
+            const translatedLabel = this.translateNavItem(`items.${updatedItem.label}`, updatedItem.label);
+            
             // update item in state
             const fullPath = `/${sectionKey}/${generatedPath}`;
             this.routes[sectionKey].items.splice(index, 1, {
               ...item,
               label: updatedItem.label,
+              translatedLabel: translatedLabel,
               path: fullPath
             });
             this.syncCache();
@@ -337,6 +373,19 @@ export const useNavigationStore = defineStore('navigation', {
             
             return { isValid: !exists, path: generatedPath };
         },
+        
+        updateTranslations() {
+          Object.values(this.routes).forEach(section => {
+            section.translatedLabel = this.translateNavItem(`navigation.${section.label}`, section.label);
+            
+            section.items.forEach(item => {
+              item.translatedLabel = this.translateNavItem(`items.${item.label}`, item.label);
+            });
+          });
+          
+          this.syncCache();
+          addDynamicRoutes()
+        }
     },
     getters: {
         serializedRoutes(state) {
@@ -344,7 +393,7 @@ export const useNavigationStore = defineStore('navigation', {
           Object.entries(state.routes).forEach(([key, section]) => {
             serializableRoutes[key] = {
               ...section,
-              component: null // Exclude component from serialization
+              component: null 
             };
           });
           return serializableRoutes;
@@ -353,13 +402,16 @@ export const useNavigationStore = defineStore('navigation', {
             const routes = []
 
             Object.entries(state.routes).forEach(([key, section]) => {
-                // add main section
                 routes.push({
                     path: section.path,
                     label: key,
                     component: markRaw(section.component),
                     props: true,
-                    meta: { isDynamic: true }
+                    meta: { 
+                      isDynamic: true,
+                      title: section.label,
+                      translatedTitle: section.translatedLabel || section.label
+                    }
                 });
 
                 // add sub-routes for items
@@ -369,7 +421,11 @@ export const useNavigationStore = defineStore('navigation', {
                         name: `${key}-${item.label.toLowerCase().replace(/\s+/g, '-')}`,
                         component: markRaw(section.component),
                         props: true,
-                        meta: { isDynamic: true }
+                        meta: { 
+                          isDynamic: true,
+                          title: item.label,
+                          translatedTitle: item.translatedLabel || item.label
+                        }
                     });
                 });
             });

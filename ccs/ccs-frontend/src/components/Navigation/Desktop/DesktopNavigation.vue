@@ -1,4 +1,5 @@
 <template>
+  <LocaleWatcher />
   <ul :class="['hidden lg:flex space-x-2', locale === 'en' ? 'text-2xl' : 'text-[1.3rem]',  $attrs.class]">
     <template v-for="(section, key) in navStore.routes" :key="key">
       <DropdownMenuItem
@@ -151,7 +152,9 @@
     <button 
       @click="toggleLanguage" 
       class="flex items-center space-x-2 px-3 text-white bg-transparent hover:bg-blue-600 rounded-lg transition-all duration-200 ease-in-out"
-      :title="locale === 'en' ? 'Switch to French' : 'Switch to English'"
+      :title="locale === 'en' 
+        ? `${translateText('toolTipMsg.frLabel', 'Switch to French')}` 
+        : `${translateText('toolTipMsg.egLabel','Switch to English')}`"
     >
       <i class="fa-solid fa-language text-xl"></i>
       <span>{{ locale === 'en' ? 'EN' : 'FR' }}</span>
@@ -211,13 +214,14 @@ import { addDynamicRoutes } from '@/router';
 import DynamicPage from '@/components/Pages/DynamicPage.vue';
 import { useI18n } from 'vue-i18n';
 import { useLanguage } from '@/composables/useLanguage';
+import LocaleWatcher from '@/components/LocaleWatcher.vue';
 
 const navStore = useNavigationStore();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
-const { t, locale } = useI18n();
-const { currentLocale, toggleLanguage, translateText } = useLanguage()
+const { t, te, locale } = useI18n();
+const { toggleLanguage, translateText } = useLanguage()
 
 
 const newItem = ref({ label: '' });
@@ -454,7 +458,7 @@ const translateItems = (items) => {
   
   return items.map(item => ({
     ...item,
-    label: t(`items.${item.label}`, item.label) 
+    label: te(`items.${item.label}`) ? t(`items.${item.label}`, item.label) : item.label 
   }));
 };
 
@@ -481,9 +485,7 @@ onMounted(async () => {
   loadingMessage.value = "Loading navigation...";
   
   try {
-    console.log("loading navigations");
     await navStore.getSection();
-    console.log("navigations loaded");
   } catch (error) {
     console.error('Error loading navigation state:', error);
   } finally {

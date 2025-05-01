@@ -166,9 +166,8 @@ watch(isMenuOpen, (newValue) => {
     ]">
       <div class="max-w-screen-xl h-full mx-auto text-white relative z-10 px-4">
         <div class="flex items-center justify-between h-full">
-          <!-- Logo with improved transitions -->
           <RouterLink :to="{ name: 'home' }" class="flex items-center gap-1 h-full">
-            <div class="flex items-center h-full">
+            <div class="flex items-center h-full gap-2">
               <img
                 :src="isAtTop ? '/src/assets/img/CCS-Logo.svg' : '/src/assets/img/CCS-Logo-lineless.svg'"
                 :class="[
@@ -177,7 +176,7 @@ watch(isMenuOpen, (newValue) => {
                 ]"
                 alt="church-logo"
               >
-              <!-- Text with improved transition -->
+
               <div class="flex flex-col justify-center h-full text-start overflow-hidden transition-all duration-200 ease-out"
                    :style="{
                      maxWidth: isAtTop ? '400px' : '0',

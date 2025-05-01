@@ -1,7 +1,22 @@
 <template>
   <div class="mx-auto" :class="{ 'px-4 py-8' : isAuthenticated && !isFullWidthLayout }">
-    <div v-if="currentSection">
-      <h1 v-if="!hasContent || !(typeof pageContent === 'object' && pageContent !== null)" class="text-4xl font-bold mb-8">{{ pageTitle }}</h1>
+    <div v-if="isNavigating" class="text-center py-8">
+      <svg class="animate-spin h-8 w-8 text-gray-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+
+    <div v-else-if="!currentSection">
+      <NotFoundView />
+    </div>
+    <div class="" v-else>
+      <h1
+        class="text-4xl font-bold space-x-1 p-4" 
+        v-if="!hasContent || !(typeof pageContent === 'object' && pageContent !== null)"
+      >
+        {{ pageTitle }}
+      </h1>
      
       <div class="prose max-w-none">
         <slot>
@@ -9,25 +24,13 @@
           
           <slot v-else>
             <div v-if="content" v-html="content"></div>
-            <div v-else class="text-gray-600">
-              Content for {{ pageTitle }} will be added soon.
+            <div v-else class="text-gray-600 text-md space-x-1 p-4">
+              {{ translateText('page.contentComingSoon', `Content for ${ pageTitle } will be added soon.`, { title: pageTitle })}}
             </div>
             <PageEditor v-if="isAuthenticated || hasContent"/>
           </slot>
         </slot>
       </div>
-    </div>
-
-    <div v-else-if="!isNavigating">
-      <NotFoundView />
-    </div>
-
-    <div v-else class="text-center py-8">
-      <!-- Loading spinner -->
-      <svg class="animate-spin h-8 w-8 text-gray-400 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
     </div>
   </div>
 </template>
@@ -40,6 +43,11 @@ import { useContentStore } from '@/stores/Content';
 import NotFoundView from '@/views/NotFoundView.vue';
 import PageEditor from './PageEditor.vue';
 import { useAuthStore } from '@/stores/Auth';
+import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
+  
+const { t, locale } = useI18n();
+const { currentLocale, toggleLanguage, translateText } = useLanguage();
 
 
 const route = useRoute();
@@ -64,9 +72,9 @@ const pageContent = ref({})
 
 const isAuthenticated = computed(() => authStore.checkAuth())
 const currentPath = computed(() => route.path)
+
 const hasContent = computed(() => {
   pageContent.value = contentStore.getPageContent(currentPath.value)
-  console.log(pageContent.value)
   return pageContent.value
 })
 
@@ -84,14 +92,16 @@ const currentSection = computed(() => {
 });
 
 const pageTitle = computed(() => {
-    const pathParts = route.path.split('/');
-    if (pathParts.length > 2) {
-        const item = currentSection.value?.items?.find(
-            item => item.path === route.path
-        );
-        return item?.label || '';
-    }
-    return currentSection.value?.label || '';
+  const pathParts = route.path.split('/');
+  if (pathParts.length > 2) {
+    const item = currentSection.value?.items?.find(
+      item => item.path === route.path
+    );
+    
+    return item?.label ? translateText(`items.${item.label}`, item.label) : '';
+  }
+  return currentSection.value?.label ? 
+    translateText(`items.${currentSection.value.label}`, currentSection.value.label) : '';
 });
 
 const pageData = computed(() => contentStore.getPageContent(currentPath.value) || {
@@ -108,17 +118,15 @@ const checkRouteValidity = async () => {
   isNavigating.value = true;
   
   try {
-    // Only fetch if not already loaded
     if (!navStore.initialized) {
       await navStore.getSection();
     }
     
-    // Get the section key from the path
+    await contentStore.loadPageContent(currentPath.value);
+
     const sectionKey = route.path.split('/')[1];
     
-    // Check if the section exists
     if (!navStore.routes[sectionKey]) {
-      // Retry a few times with delay before giving up
       if (retryCount.value < maxRetries) {
         retryCount.value++;
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -132,7 +140,6 @@ const checkRouteValidity = async () => {
       return;
     }
     
-    // For item routes, check if the item exists
     if (route.path.split('/').length > 2) {
       const itemExists = navStore.routes[sectionKey]?.items?.some(
         item => item.path === route.path
@@ -146,7 +153,6 @@ const checkRouteValidity = async () => {
     }
   } catch (error) {
     console.error('Route validation error:', error);
-    // Only redirect if we're not already on notFound
     if (route.name !== 'notFound') {
       router.replace({ name: 'notFound' });
     }

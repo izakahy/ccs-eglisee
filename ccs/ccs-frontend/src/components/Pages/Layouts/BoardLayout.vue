@@ -1,12 +1,13 @@
 <template>
     <div class="relative w-full overflow-hidden">
-        <div v-if="contents.bgIMG && contents.bgIMG.src" class="group relative w-full overflow-hidden h-[50dvh] shadow-lg">
+      <div v-if="contents.bgIMG && contents.bgIMG.src" class="group relative w-full overflow-hidden h-[50dvh] shadow-lg">
         <div class="relative h-full w-full overflow-hidden">
             <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
             <div class="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
             </div>
             <img
             :src="contents.bgIMG.src"
+            loading="lazy"
             @load="loading = false"
             class="h-full w-full object-cover"
             :class="{ 'opacity-0': loading, 'opacity-100': !loading }"
@@ -14,6 +15,7 @@
             />
             <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
         </div>
+
         <div class="absolute inset-0 flex items-center justify-center p-4">
             <div class="text-center space-y-4 max-w-3xl">
             <span v-if="contents.bgIMG.category" class="inline-block rounded-full bg-primary/90 px-4 py-1.5 text-sm font-medium text-white tracking-wider">
@@ -27,9 +29,8 @@
             </p>
             </div>
         </div>
-        </div>
+      </div>
     
-      <!-- Board Members Section -->
       <div class="relative mx-auto max-w-6xl py-16 px-6 md:px-8 bg-white">
         <div v-if="contents.content1" class="text-center mb-12">
             <div v-html="contents.content1" class="prose prose-lg max-w-none"></div>

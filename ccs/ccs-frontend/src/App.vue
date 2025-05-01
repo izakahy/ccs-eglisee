@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen w-full flex flex-col">
-    <AppHeader class="sticky w-full top-0 transition-all duration-300 z-[10]" />
+    <AppHeader class="sticky w-full top-0 transition-all duration-300 z-[100]" />
     
     <!-- Loading Overlay -->
     <div v-if="!navStore.initialized" class="">
@@ -12,7 +12,7 @@
         <span class="mt-4 text-sm font-medium text-gray-700">Loading...</span>
       </div>
     </div>
-    
+    <LocaleWatcher />
     <main class="flex-grow">
       <RouterView />
     </main>
@@ -25,6 +25,7 @@ import { RouterView } from 'vue-router'
 import AppHeader from './components/AppHeader.vue'
 import AppFooter from './components/AppFooter.vue'
 import { useNavigationStore } from './stores/NavItems/Navigation';
+import LocaleWatcher from './components/LocaleWatcher.vue';
 
 const navStore = useNavigationStore();
 </script>

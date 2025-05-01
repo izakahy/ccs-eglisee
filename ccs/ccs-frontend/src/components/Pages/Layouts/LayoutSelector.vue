@@ -15,9 +15,14 @@
             <!-- Visual Representation -->
             <div class="mb-2">
               <div v-if="layout.id === 'single'" class="w-16 h-12 bg-gray-300 rounded"></div>
-              <div v-else-if="layout.id === 'gallary'" class="flex gap-2">
-                <div class="w-10 h-12 bg-gray-300 rounded"></div>
-                <div class="w-4 h-12 bg-gray-300 rounded"></div>
+              <div v-else-if="layout.id === 'gallary'" class="flex flex-col gap-2">
+                <div class="w-full h-6 bg-gray-300 rounded"></div>
+                <div class="h-1 bg-gray-300 rounded"></div>
+                <div class="flex">
+                  <div class="w-4 h-2 bg-gray-300 rounded"></div>
+                  <div class="w-4 h-2 bg-gray-300 rounded"></div>
+                  <div class="w-4 h-2 bg-gray-300 rounded"></div>
+                </div>
               </div>
               <div v-else-if="layout.id === 'default'" class="flex flex-col gap-1">
                 <div class="w-16 h-6 bg-gray-300 rounded"></div>

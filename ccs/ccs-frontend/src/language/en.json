@@ -2,7 +2,7 @@
     "welcome": "Welcome",
     "serviceTimes": "service times",
     "sundayService": "Sunday Service",
-    "joinUs": "Join Us Sunday at 10:00 AM",
+    "joinUs": "Join Us Sunday at 10:30 AM",
     "address": "58 FESTIVAL STREET, SHEDIAC, NB E4P IS4",
     "learnMore": "Learn More",
     "latestSermons": "LATEST SERMONS",
@@ -36,7 +36,7 @@
         "Member": "Member",
         "Donate": "Donate",
         "Update": "Update",
-        "sssss": "sssss"
+        "CHURCH": "CHURCH" 
     },
     "invitationCard": {
         "title": {
@@ -46,7 +46,14 @@
         }
     },
     "toolTipMsg": {
-        "close": "Close"
+        "close": "Close",
+        "frLabel": "Switch to French",
+        "egLabel": "Switch to English"
+    },
+    "page": {
+        "contentComingSoon": "Content for {title} will be added soon.",
+        "notFound": "Page not found (Error 404).",
+        "goHome": "Go Home"
     },
     "time": {
         "days": "d",

@@ -157,6 +157,15 @@
                         class="mt-1 block w-full rounded-md p-3 border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
                       />
                     </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700">Bio</label>
+                      <input
+                        v-model="item.bio"
+                        type="text"
+                        placeholder="Enter Bio"
+                        class="mt-1 block w-full rounded-md p-3 border-gray-300 shadow-sm focus:ring-primary focus:border-primary"
+                      />
+                    </div>
                     <button
                       @click="removeBoardItem(index)"
                       class="text-red-600 hover:text-red-800 font-medium"
