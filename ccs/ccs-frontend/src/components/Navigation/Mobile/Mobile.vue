@@ -30,7 +30,7 @@
             </svg>
           </button>
           <h2 class="text-white text-4xl font-bold w-1/2 text-center">
-            {{ currentView.label }}
+            {{ translateText(`navigation.${currentView.label}`, currentView.label) }}
           </h2>
         </div>
 
@@ -46,7 +46,7 @@
               class="block w-full py-3 text-center text-2xl text-gray-300 hover:text-[clamp(2rem,3vw,4rem)]"
               @click="handleLinkClick"
             >
-              {{ item.label }}
+              {{ translateText(`items.${item.label}`, item.label) }}
             </RouterLink>
             <hr class="border-gray-50 w-full my-2" />
           </li>
@@ -79,7 +79,7 @@
                   'animate-shake' : activeSectionKey === key,
                   'text-[clamp(2rem,3vw,4rem)]' : activeSectionKey === key
                 }">
-                  {{ section.label }}
+                  {{ translateText(`navigation.${section.label}`, section.label) }}
                   
                    <!-- Progress indicator -->
                   <div 
@@ -104,23 +104,27 @@
                 class="block w-1/2 mx-auto py-3 text-center text-3xl text-white hover:text-[clamp(2rem,3vw,4rem)]"
                 @click="handleLinkClick"
               >
-                {{ section.label }}
+                {{ translateText(`navigation.${section.label}`, section.label) }}
               </RouterLink>
             </li>
             <hr class="border-gray-700 w-1/2 mx-auto my-2" />
           </template>
 
-          <!-- Static Sections -->
-          <li class="w-full font-bold">
-            <div class="relative w-1/2 mx-auto">
-              <a
-                href="https://www.youtube.com/@CommunauteCompassionShediac"
-                class="block w-full py-3 text-center text-3xl text-white hover:text-[clamp(2rem,3vw,4rem)]"
-              >
-                WATCH
+          <div class="border-t-2 border-solid w-1/2">
+            <h3 class="text-white text-center font-semibold text-lg mb-4">{{ translateText('connectWithUs', 'Connect With Us')}}</h3>
+            <div class="flex space-x-4 mb-4 justify-center">
+              <a href="https://www.youtube.com/@CommunauteCompassionShediac" 
+                target="_blank"
+                 class="text-gray-400 hover:text-[#FF0000] transition-colors">
+                <i class="fa-brands fa-youtube text-4xl hover:-translate-y-1 transition-all ease-in-out"></i>
+              </a>
+              <a href="https://www.facebook.com/people/Communaut%C3%A9-de-la-Compassion-Shediac/61556619750757/"
+                target="_blank" 
+                 class="text-gray-400 hover:text-[#1877F2] transition-colors">
+                <i class="fa-brands fa-facebook text-4xl hover:-translate-y-1 transition-all ease-in-out"></i>
               </a>
             </div>
-          </li>
+          </div>
         </ul>
       </div>
     </transition>
@@ -132,9 +136,12 @@ import { ref, computed, watch } from 'vue'
 import { useNavigationStore } from '@/stores/NavItems/Navigation'
 import { RouterLink } from 'vue-router'
 import router from '@/router'
+import { useLanguage } from '@/composables/useLanguage'
+
 
 const navStore = useNavigationStore()
 const emit = defineEmits(['close-menu'])
+const { translateText } = useLanguage()
 
 const navigationStack = ref([])
 const transitionDirection = ref('slide-left')
@@ -165,12 +172,10 @@ const startLongPress = (section, key, event) => {
   activeSectionKey.value = key
   pressProgress.value = 0
   
-  // animate
   progressInterval.value = setInterval(() => {
     pressProgress.value += (100 / (longPressDuration / 50))  
   }, 50)
 
-  // haptic for android or iphone
   if (navigator.vibrate) {
     navigator.vibrate(200)
   } else if (window.webkit?.messageHandlers) {
@@ -192,7 +197,6 @@ const cancelLongPress = () => {
     longPressTimer.value = null
   }
 
-  // Stop any ongoing vibration
   if (navigator.vibrate) navigator.vibrate(0)
 }
 

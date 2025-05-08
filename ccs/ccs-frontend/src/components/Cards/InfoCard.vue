@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-3xl mx-auto text-center">
+    <div class="max-w-4xl mx-auto text-center">
       <h2 class="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl lg:text-7xl">
         <span class="block">{{ ($te('serviceTimes') ? t('serviceTimes') : title).toUpperCase() }}</span>
       </h2>

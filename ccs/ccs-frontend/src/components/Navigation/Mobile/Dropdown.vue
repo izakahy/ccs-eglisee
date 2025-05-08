@@ -39,6 +39,9 @@
 <script setup>
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
+import { useLanguage } from '@/composables/useLanguage';
+
+const { translateText } = useLanguage();
 
 defineProps({
   label: String,

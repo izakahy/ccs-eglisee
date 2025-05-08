@@ -15,7 +15,7 @@
         class="text-4xl font-bold space-x-1 p-4" 
         v-if="!hasContent || !(typeof pageContent === 'object' && pageContent !== null)"
       >
-        {{ pageTitle }}
+        {{ translateText(`navigation.${pageTitle}`, pageTitle) }}
       </h1>
      
       <div class="prose max-w-none">
@@ -25,7 +25,7 @@
           <slot v-else>
             <div v-if="content" v-html="content"></div>
             <div v-else class="text-gray-600 text-md space-x-1 p-4">
-              {{ translateText('page.contentComingSoon', `Content for ${ pageTitle } will be added soon.`, { title: pageTitle })}}
+              {{ translateText('page.contentComingSoon', 'Content for { title } will be added soon.', { title: pageTitle })}}
             </div>
             <PageEditor v-if="isAuthenticated || hasContent"/>
           </slot>
@@ -47,7 +47,7 @@ import { useI18n } from 'vue-i18n';
 import { useLanguage } from '@/composables/useLanguage';
   
 const { t, locale } = useI18n();
-const { currentLocale, toggleLanguage, translateText } = useLanguage();
+const { translateText } = useLanguage();
 
 
 const route = useRoute();
@@ -82,7 +82,6 @@ const hasContentWithHeading = computed(() => {
   const result = pageContent.value?.contents?.content1 && 
          pageContent.value.contents.content1.includes('<h1');
   
-  console.log("This page does have h1 " + result)         
   return result
 });
 
@@ -101,7 +100,7 @@ const pageTitle = computed(() => {
     return item?.label ? translateText(`items.${item.label}`, item.label) : '';
   }
   return currentSection.value?.label ? 
-    translateText(`items.${currentSection.value.label}`, currentSection.value.label) : '';
+    translateText(`navigation.${currentSection.value.label}`, currentSection.value.label) : '';
 });
 
 const pageData = computed(() => contentStore.getPageContent(currentPath.value) || {

@@ -188,7 +188,6 @@ export const useContentStore = defineStore('content', {
     },
 
     async saveContent(path, content) {
-      debugger
       this.isLoading = true;
       try {
         // Update backend
@@ -273,4 +272,4 @@ export const useContentStore = defineStore('content', {
       return state.cards[id]?.isLoading || false;
     }
   }
-});
+}); 

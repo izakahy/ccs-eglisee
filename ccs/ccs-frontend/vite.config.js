@@ -10,6 +10,7 @@ const apiTarget = isArtisan ? 'http://127.0.0.1:8000' : 'http://localhost';
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/',
   plugins: [
     vue(),
     vueDevTools(),

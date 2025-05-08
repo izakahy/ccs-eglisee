@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100]">
     <div :class="[
       'bg-white rounded-xl shadow-sm overflow-hidden flex flex-col transition-all duration-300',
       dialogSize === 'fullscreen' ? 'w-full h-full' : 

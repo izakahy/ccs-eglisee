@@ -1,6 +1,6 @@
 {
     "welcome": "Welcome",
-    "serviceTimes": "service times",
+    "serviceTimes": "service time 10:30 AM",
     "sundayService": "Sunday Service",
     "joinUs": "Join Us Sunday at 10:30 AM",
     "address": "58 FESTIVAL STREET, SHEDIAC, NB E4P IS4",
@@ -25,7 +25,7 @@
         "GALLERY": "GALLERY",
         "GIVE": "GIVE",
         "NEW": "NEW",
-        "X": "X" 
+        "EVENT": "EVENT" 
     },
     "items": {
         "Our Story": "Our Story",
@@ -36,7 +36,7 @@
         "Member": "Member",
         "Donate": "Donate",
         "Update": "Update",
-        "CHURCH": "CHURCH" 
+        "CHURCH": "CHURCH"
     },
     "invitationCard": {
         "title": {

@@ -8,6 +8,9 @@ import Hamburger from './Navigation/Mobile/HamburgerMenu.vue';
 import Desktop from './Navigation/Desktop/DesktopNavigation.vue';
 import { useAboutStore } from '@/stores/NavItems/About';
 import CountdownBanner from './Cards/CountdownBanner.vue';
+import logoTop from '@/assets/img/CCS-Logo.svg';
+import logoScroll from '@/assets/img/CCS-Logo-lineless.svg';
+import ChangeLanguage from './Helper/ChangeLanguage.vue';
 
 const authStore = useAuthStore();
 const aboutStore = useAboutStore();
@@ -169,7 +172,7 @@ watch(isMenuOpen, (newValue) => {
           <RouterLink :to="{ name: 'home' }" class="flex items-center gap-1 h-full">
             <div class="flex items-center h-full gap-2">
               <img
-                :src="isAtTop ? '/src/assets/img/CCS-Logo.svg' : '/src/assets/img/CCS-Logo-lineless.svg'"
+                :src="isAtTop ? logoTop : logoScroll"
                 :class="[
                   'transition-all duration-200 ease-out',
                   isAtTop ? 'w-9 md:w-16 lg:w-16' : 'w-6 md:w-12 lg:w-12'
@@ -202,11 +205,14 @@ watch(isMenuOpen, (newValue) => {
             :loading="authStore.isLoading" 
           />
 
+          <ChangeLanguage class="lg:hidden"/>
+
           <Hamburger 
             class="h-full flex items-center"
             :is-open="isMenuOpen" 
             @toggle="isMenuOpen = !isMenuOpen" 
           />
+
 
           <Desktop 
             class="h-full flex items-center relative z-20"

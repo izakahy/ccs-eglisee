@@ -3,7 +3,9 @@ import axios from "axios";
 import  router from "@/router";
 
 const api = axios.create({
-    baseURL: '',
+    baseURL: import.meta.env.PROD
+    ? 'https://ccs-eglise.org/api'
+    : '',
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'

@@ -16,6 +16,17 @@ onMounted(() => {
   isLoggedIn.value = authStore.checkAuth();
 });
 
+const capitalizeWordsAtIndices = (str, indices) => {
+  const words = str.split(' ');
+  indices.forEach(index => {
+    if (words.length > index) {
+      words[index] = words[index].charAt(0).toUpperCase() + words[index].slice(1);
+    }
+  });
+  return words.join(' ');
+}
+
+
 
 const handleLogin = () => {
   authStore.googleLogin();
@@ -51,7 +62,9 @@ const handleLogin = () => {
         </div>
         
         <div>
-          <h3 class="text-white font-semibold text-lg mb-4">{{ translateText('serviceTimes', 'Service Times') }}</h3>
+          <h3 class="text-white font-semibold text-lg mb-4">
+            {{ capitalizeWordsAtIndices(translateText('serviceTimes', 'Service Times 10:30 Am'), [0,1]) }}
+          </h3>
           <div class="flex items-center space-x-3">
             <ClockIcon class="h-5 w-5 text-gray-400" />
             <p class="cursor-pointer text-gray-300 hover:text-white transition-colors">{{ translateText('everySunday', 'Every Sunday')}}</p>
@@ -66,7 +79,7 @@ const handleLogin = () => {
                class="text-gray-400 hover:text-[#FF0000] transition-colors">
               <i class="fa-brands fa-youtube text-3xl hover:-translate-y-1 transition-all ease-in-out"></i>
             </a>
-            <a href="https://www.facebook.com/@CommunauteCompassionShediac"
+            <a href="https://www.facebook.com/people/Communaut%C3%A9-de-la-Compassion-Shediac/61556619750757/"
               target="_blank" 
                class="text-gray-400 hover:text-[#1877F2] transition-colors">
               <i class="fa-brands fa-facebook text-3xl hover:-translate-y-1 transition-all ease-in-out"></i>

@@ -1,6 +1,6 @@
 {
   "welcome": "Bienvenue",
-  "serviceTimes": "temps de service",
+  "serviceTimes": "temps de service 10h30",
   "sundayService": "Service du dimanche",
   "joinUs": "Joignez-vous à nous dimanche à 10 h 30",
   "address": "58, RUE FESTIVAL, SHEDIAC, NB E4P IS4",
@@ -18,26 +18,25 @@
   "contactUs": "Contactez-nous",
   "nextService":"Prochain culte dans",
   "connectWithUs": "Connectez-vous avec nous",
-  "everySunday": "Chaque dimanche",
+  "everySunday": "Chaque dimanche ",
   "navigation": {
       "ABOUT": "À PROPOS",
       "CONNECT": "CONNECTER",
       "GALLERY": "GALERIE",
       "GIVE": "DONNER",
       "NEW": "NOUVEAU",
-      "X": "X"
+      "EVENT": "ÉVÉNEMENT"
   },
   "items": {
       "Our Story": "Notre Histoire",
       "Mission": "Mission",
       "Team": "Équipe",
-      "House Fellowship": "Communion à Domicile",
+      "House Fellowship": "Maison de Communion",
       "Conversation Sundays": "Conversations du Dimanche",
       "Member": "Membre",
-      "ss": "ss",
       "Donate": "Faire un Don",
       "Update": "Actualiser",
-      "CHURCH": "ÉGLISE" 
+      "CHURCH": "ÉGLISE"
     },
     "invitationCard": {
       "title": {

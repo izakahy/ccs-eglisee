@@ -1,21 +1,21 @@
 <template>
-  <div v-if="!closed" class="bg-[#edc24c] text-gray-100 p-3 shadow-md relative">
-    <div class="container mx-auto flex items-center justify-between flex-wrap md:flex-nowrap">
+  <div v-if="!closed" class="bg-[#edc24c] text-gray-100 px-3 md:p-3 lg:p-3 shadow-md relative">
+    <div class="container mx-auto flex items-center justify-between flex-wrap">
       <div class="flex items-center space-x-2 mb-2 md:mb-0">
         <h3 class="font-bold text-xl">{{ translateText('sundayService', props.sundayServiceMsg) }}</h3>
       </div>
       
-      <div class="flex items-center font-bold space-x-2 mb-2 md:mb-0">
+      <div class="flex items-center gap-16 lg:gap-0 font-bold space-x-2 mb-2 md:mb-0">
         <div class="text-center">
           <p class="text-sm">{{ isServiceHappening ? translateText('serviceNow', props.serviceNowMsg) : translateText('nextService', props.nextServiceMsg) }}:</p>
         </div>
-        <div class="font-mono text-lg text-[#347055] border border-solid border-opacity-100 bg-white bg-opacity-20 px-3 py-1 rounded">
+        <div class="font-mono text-lg text-[#347055] border border-solid border-opacity-100 bg-white bg-opacity-20 px-3 py-0 md:p-1 lg:p-1 rounded">
           {{ isServiceHappening ? translateText('liveNow', props.liveNowMsg) : displayTime }}
         </div>
       </div>
       
       <div class="mb-2 md:mb-0">
-        <button class="bg-white text-[#347055] px-5 py-2 rounded-md font-medium border border-black border-solid hover:bg-gray-100 transition-colors duration-200 shadow-sm">
+        <button class="bg-white text-[#347055] px-5 py-1 md:py-2 lg:py-2 rounded-md font-medium border border-black border-solid hover:bg-gray-100 transition-colors duration-200 shadow-sm">
           {{ isServiceHappening ? translateText('joinLive', props.joinLiveMsg) : translateText('joinUs', props.joinMsg) }}
         </button>
       </div>

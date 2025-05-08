@@ -3,62 +3,20 @@
     <div :class="{ 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6' : isAuthenticated }">
       
       <!-- Admin Header -->
-      <div v-if="isAuthenticated" class="bg-white rounded-xl shadow-sm p-5 mb-6">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-          <!-- Layout Selector -->
-          <div class="flex flex-col">
-            <label class="text-sm font-medium text-gray-700 mb-1.5">Page Layout</label>
-            <button 
-              @click="showLayoutDialog = true"
-              class="flex items-center justify-between w-full md:w-64 px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <span class="font-medium">{{ currentLayoutName }}</span>
-              <i class="fa-solid fa-caret-down text-gray-400"></i>
-            </button>
-            <LayoutSelector 
-              v-model="showLayoutDialog" 
-              :current-layout="editableLayout" 
-              @update:layout="editableLayout = $event" 
-            />
-          </div>
-          <!-- Action Buttons -->
-          <div class="flex flex-wrap items-center gap-3">
-            <button 
-              @click="contentStore.toggleEditMode()"
-              class="inline-flex items-center px-4 py-2.5 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
-              :class="contentStore.isEditing ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500' : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'"
-            >
-              <i v-if="!contentStore.isEditing" class="fa-solid fa-pen-to-square mr-2"></i>
-              <i v-else class="fa-solid fa-xmark mr-2"></i>
-              {{ contentStore.isEditing ? "Exit Edit Mode" : "Edit Page" }}
-            </button>
-            <button 
-              v-if="contentStore.isEditing"
-              @click="saveContent"
-              class="inline-flex items-center px-4 py-2.5 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-            >
-              <i class="fa-solid fa-floppy-disk mr-2"></i>
-              Save Changes
-            </button>
-            <button 
-              v-if="contentStore.isEditing"
-              @click="confirmDelete"
-              class="inline-flex items-center px-4 py-2.5 bg-white border border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-            >
-              <i class="fa-solid fa-trash-can mr-2"></i>
-              Delete Content
-            </button>
-            <button 
-              v-if="contentStore.isEditing"
-              @click="showPreviewDialog = true"
-              class="inline-flex items-center px-4 py-2.5 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-            >
-              <i class="fa-solid fa-eye mr-2"></i>
-              Preview
-            </button>
-          </div>
-        </div>
-      </div>
+      <AdminHeader
+        :is-authenticated="isAuthenticated"
+        :is-editing="contentStore.isEditing"
+        :editable-layout="editableLayout"
+        :contents="editableContents"
+        :show-layout-dialog="showLayoutDialog"
+        :show-preview-dialog="showPreviewDialog"
+        @update:editable-layout="editableLayout = $event"
+        @update:show-layout-dialog="showLayoutDialog = $event"
+        @update:show-preview-dialog="showPreviewDialog = $event"
+        @toggle-edit-mode="contentStore.toggleEditMode()"
+        @save="saveContent"
+        @delete="confirmDelete"
+      />
 
       <!-- Editor -->
       <div v-if="isAuthenticated && contentStore.isEditing" class="editor-container space-y-6">
@@ -231,6 +189,14 @@
         <slot v-else></slot>
       </div>
     </div>
+
+    <FloatingActionbtn
+      :is-authenticated="isAuthenticated"
+      :is-editing="contentStore.isEditing"
+      @save="saveContent"
+      @delete="confirmDelete"
+      @preview="showPreviewDialog = true"
+    />
   </div>
 </template>
 
@@ -250,6 +216,8 @@ import DefaultLayout from "./Layouts/DefaultLayout.vue";
 import BoardLayout from "./Layouts/BoardLayout.vue";
 import { useTipTap } from "@/composables/useTipTap";
 import GalleryItemEditor from "./Layouts/GalleryItemEditor.vue";
+import AdminHeader from "./AdminHeader.vue";
+import FloatingActionbtn from "./Layouts/FloatingActionbtn.vue";
 
 const layoutComponents = {
   single: SingleColumnLayout,
@@ -517,16 +485,19 @@ onBeforeUnmount(() => {
 
 // Save handler
 const saveContent = async () => {
-  if (editableContents.value.bgIMG?.caption?.startsWith('Image')) {
-    if(!confirm('Do you want to save this caption name?')) {
-      return;
+  if(confirm("Are you sure you want to save this content? ")) {
+
+    if (editableContents.value.bgIMG?.caption?.startsWith('Image')) {
+      if(!confirm('Do you want to save this caption name?')) {
+        return;
+      }
     }
+    const success = await contentStore.saveContent(currentPath.value, {
+      layout: editableLayout.value,
+      contents: editableContents.value,
+    });
+    alert(success ? "Content was successfully saved!" : "Content not saved");
   }
-  const success = await contentStore.saveContent(currentPath.value, {
-    layout: editableLayout.value,
-    contents: editableContents.value,
-  });
-  alert(success ? "Content was successfully saved!" : "Content not saved");
 };
 
 // Delete handler
