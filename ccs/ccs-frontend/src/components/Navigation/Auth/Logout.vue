@@ -3,8 +3,8 @@
      <div class="flex items-center space-x-4">
               <span
               v-if="isLoggedIn"
-              class="text-sm text-orange-100">
-                 Welcome {{ username }}
+              class="text-sm md:text-base text-orange-300">
+                 Welcome: <span class="text-white font-bold">{{ username }}</span>
               </span> 
               <a 
                   type="button" 
@@ -32,6 +32,7 @@ const props = defineProps({
     required: true
   },
   username:  String,
+  pfp: String,
   onLogout: {
     type: Function,
     required: true

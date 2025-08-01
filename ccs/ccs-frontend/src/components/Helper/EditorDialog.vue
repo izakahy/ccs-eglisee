@@ -31,107 +31,25 @@
                       
                   <div v-else>
                       <div v-if="editor" class="border rounded-t-lg">
-                        <div class="flex gap-1 p-2 border-b flex-wrap">
-                                  
-                                  <!-- Text Formatting -->
-                                  <button 
-                                      @click="editor.chain().focus().toggleBold().run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive('bold') }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Bold (Ctrl+B)"
-                                  >
-                                      <i class="fa-solid fa-bold w-4 h-4"></i>
-                                  </button>
-                                  <button 
-                                      @click="editor.chain().focus().toggleItalic().run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive('italic') }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Italic (Ctrl+I)"
-                                  >
-                                      <i class="fa-solid fa-italic w-4 h-4"></i>
-                                  </button>
-                                  <button 
-                                      @click="editor.chain().focus().toggleUnderline().run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive('underline') }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Underline (Ctrl+U)"
-                                  >
-                                      <i class="fa-solid fa-underline w-4 h-4"></i>
-                                  </button>
+                        <EditorToolbar
+                          :editor="editor"
+                          :current-heading-level="currentHeadingLevel"
+                          :features="{
+                            underline: true,
+                            orderedList: true,
+                            textAlign: true,
+                            highlight: true,
+                            image: false
+                          }" 
+                          @heading-update="tipTap.toggleHeading"
+                        />
 
-                                  <!-- Headings Dropdown -->
-                                  <select 
-                                      @change="e => updateHeading(e.target.value)"
-                                      :value="currentHeadingLevel"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Heading style"
-                                      >
-                                      <option value="">Normal</option>
-                                      <option value="1">Heading 1</option>
-                                      <option value="2">Heading 2</option>
-                                      <option value="3">Heading 3</option>
-                                  </select>
-
-                                  <!-- Lists -->
-                                  <button 
-                                      @click="editor.chain().focus().toggleBulletList().run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive('bulletList') }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Bullet List"
-                                  >
-                                      <i class="fa-solid fa-list w-4 h-4"></i>
-                                  </button>
-                                  <button 
-                                      @click="editor.chain().focus().toggleOrderedList().run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive('orderedList') }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Numbered List"
-                                  >
-                                      <i class="fa-solid fa-list-ol w-4 h-4"></i>
-                                  </button>
-                                  <!-- Text Alignment -->
-                                  <button 
-                                      @click="editor.chain().focus().setTextAlign('left').run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive({ textAlign: 'left' }) }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Align Left"
-                                  >
-                                      <i class="fa-solid fa-align-left w-4 h-4"></i>
-                                  </button>
-                                  <button 
-                                      @click="editor.chain().focus().setTextAlign('center').run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive({ textAlign: 'center' }) }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Align Center"
-                                  >
-                                      <i class="fa-solid fa-align-center w-4 h-4"></i>
-                                  </button>
-                                  <button 
-                                      @click="editor.chain().focus().setTextAlign('right').run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive({ textAlign: 'right' }) }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Align Right"
-                                  >
-                                      <i class="fa-solid fa-align-right w-4 h-4"></i>
-                                  </button>
-
-                                  <!-- Highlight -->
-                                  <button 
-                                      @click="editor.chain().focus().toggleHighlight().run()"
-                                      :class="{ 'bg-gray-100': editor?.isActive('highlight') }"
-                                      class="p-2 hover:bg-gray-100 rounded"
-                                      title="Highlight"
-                                  >
-                                      <i class="fa-solid fa-highlighter w-4 h-4"></i>
-                                  </button>
-                              </div>
-
-                              <editor-content 
-                                  :editor="editor" 
-                                  class="editor-content prose max-w-none p-4 min-h-[50vh] max-h-[60vh] overflow-y-auto"
-                              />
-                          </div>
+                        <editor-content 
+                          :editor="editor" 
+                          class="editor-content prose max-w-none p-4 min-h-[50vh] max-h-[60vh] overflow-y-auto"
+                        />
                       </div>
+                    </div>
                 </div>
 
                 <div 
@@ -184,188 +102,164 @@
   </template>
 
  <script setup>
-  import { ref, watch, nextTick, onBeforeUnmount, computed } from 'vue'
-  import { useEditor, EditorContent } from '@tiptap/vue-3'
-  import CharacterCount from '@tiptap/extension-character-count'
-  import { extensions, editorProps } from '@/tiptap/config'
+import { ref, watch, nextTick, onBeforeUnmount, computed, onMounted } from 'vue';
+import { EditorContent } from '@tiptap/vue-3';
+import { useTipTap } from '@/composables/useTipTap';
+import EditorToolbar from './EditorToolbar.vue';
 
-  const props = defineProps({
-    modelValue: Boolean,
-    editType: String,
-    titleValue: String,
-    bodyValue: String,
-    isLoading: {
-      type: Boolean,
-      default: false
-    }
-  })
-
-  const emit = defineEmits(['update:modelValue', 'update:title', 'update:body'])
-  const localTitle = ref(props.titleValue)
-  const CHAR_LIMIT = 1000
-  const WARNING_THRESHOLD = 0.8
-
-  const editor = useEditor({
-    extensions: [
-      ...extensions,
-      CharacterCount.configure({
-        limit: 1000
-      })
-    ],
-    content: props.bodyValue,
-    editable: false,
-    editorProps
-  })
-
-  const currentHeadingLevel = computed(() => {
-    return editor.value?.getAttributes('heading').level || ''
-  })
-
-  const updateHeading = (level) => {
-    const lvl = parseInt(level)
-    if (editor.value) {
-      if (lvl) {
-        editor.value.chain().focus().toggleHeading({ level: lvl }).run()
-      } else {
-        editor.value.chain().focus().setParagraph().run()
-      }
-    }
+const props = defineProps({
+  modelValue: Boolean,
+  editType: String,
+  titleValue: String,
+  bodyValue: String,
+  isLoading: {
+    type: Boolean,
+    default: false
   }
+});
 
-  const handleKeydown = (e) => {
-    if (!props.modelValue) return
-    
-    const focusable = [
-      ...document.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-    ].filter(el => el.offsetParent !== null) // Only visible elements
-    
-    if (e.key === 'Tab') {
-      if (focusable.length === 0) {
-        e.preventDefault()
-        return
-      }
-      
-      const first = focusable[0]
-      const last = focusable[focusable.length - 1]
-      
-      if (e.shiftKey && document.activeElement === first) {
-        last.focus()
-        e.preventDefault()
-      } else if (!e.shiftKey && document.activeElement === last) {
-        first.focus()
-        e.preventDefault()
-      }
-    }
-    
-    if (e.key === 'Escape') {
-      cancelEdit()
-    }
+const emit = defineEmits(['update:modelValue', 'update:title', 'update:body']);
+const localTitle = ref(props.titleValue);
+const CHAR_LIMIT = 1000;
+const WARNING_THRESHOLD = 0.8;
+
+const tipTap = useTipTap({
+  content: props.bodyValue,
+  withCharCount: true,
+  charLimit: CHAR_LIMIT,
+  editable: false,
+  withImage: false,
+  onUpdate: () => {}
+});
+
+const editor = ref(null);
+
+onMounted(() => {
+  editor.value = tipTap.initEditor();
+});
+
+const currentHeadingLevel = computed(() => {
+  return editor.value?.getAttributes('heading').level || '';
+});
+
+const isNearLimit = computed(() => {
+  const charCount = editor.value?.storage.characterCount.characters() || 0;
+  return charCount >= CHAR_LIMIT * WARNING_THRESHOLD;
+});
+
+const isAtLimit = computed(() => {
+  const charCount = editor.value?.storage.characterCount.characters() || 0;
+  return charCount >= CHAR_LIMIT;
+});
+
+const characterLimitTitle = computed(() => {
+  if (isAtLimit.value) {
+    return 'Character limit reached';
   }
+  if (isNearLimit.value) {
+    return 'Approaching character limit';
+  }
+  return '';
+});
 
-  watch(() => props.modelValue, (show) => {
-    if (show) {
-      window.addEventListener('keydown', handleKeydown)
+watch(() => props.modelValue, (show) => {
+  if (show) {
+    nextTick(() => {
+      if (props.editType === 'body' && editor.value) {
+        tipTap.setContent(props.bodyValue);
+        editor?.value.setEditable(true);
+        setTimeout(() => {
+          tipTap.focusEditor();
+        }, 100);
+      }
+    });
+  } else if (editor.value) {
+    editor.value.setEditable(false);
+  }
+});
+
+watch(() => props.modelValue, (show) => {
+  if (show) {
+    window.addEventListener('keydown', handleKeydown);
+    document.body.classList.add('overflow-hidden');
+    if (props.editType === 'title') {
+      document.querySelector('input')?.focus();
     } else {
-      window.removeEventListener('keydown', handleKeydown)
+      tipTap.focusEditor();
     }
-  })
+  } else {
+    window.removeEventListener('keydown', handleKeydown);
+    document.body.classList.remove('overflow-hidden');
+  }
+});
 
-  watch(() => props.modelValue, (show) => {
-    if (show) {
-      document.body.classList.add('overflow-hidden')
-      // Focus first interactive element
-      if (props.editType === 'title') {
-        document.querySelector('input')?.focus()
-      } else {
-        editor.value?.commands.focus()
-      }
-    } else {
-      document.body.classList.remove('overflow-hidden')
+watch(() => props.titleValue, (newValue) => {
+  localTitle.value = newValue;
+});
+
+watch(() => props.bodyValue, (newContent) => {
+  if (props.editType === 'body' && editor.value?.isEditable && newContent !== editor.value.getHTML()) {
+    tipTap.setContent(newContent);
+  }
+});
+
+const handleKeydown = (e) => {
+  if (!props.modelValue) return;
+  const focusable = [
+    ...document.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  ].filter(el => el.offsetParent !== null);
+  if (e.key === 'Tab') {
+    if (focusable.length === 0) {
+      e.preventDefault();
+      return;
     }
-  })
-
-
-  watch(() => props.modelValue, (show) => {
-    if (show) {
-      nextTick(() => {
-        if (props.editType === 'body' && editor.value) {
-          editor.value.commands.setContent(props.bodyValue)
-          editor.value.setEditable(true)
-          setTimeout(() => {
-            editor.value.commands.focus()
-            editor.value.commands.scrollIntoView()
-          }, 100)
-        }
-      })
-    } else if (editor.value) {
-      editor.value.setEditable(false)
-    }
-  })
-
-  watch(() => props.titleValue, (newValue) => {
-    localTitle.value = newValue
-  })
-
-  watch(() => props.bodyValue, (newContent) => {
-    if (props.editType === 'body' && editor.value?.isEditable && newContent !== editor.value.getHTML()) {
-      editor.value.commands.setContent(newContent)
-    }
-  })
-
-  const cancelEdit = () => {
-    emit('update:modelValue', false)
-    if (props.editType === 'body' && editor.value) {
-      editor.value.commands.setContent(props.bodyValue)
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      last.focus();
+      e.preventDefault();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      first.focus();
+      e.preventDefault();
     }
   }
-
-  const saveEdit = () => {
-    if (props.isLoading) return
-    try {
-      if (props.editType === 'title') {
-        emit('update:title', localTitle.value)
-      } else if (editor.value && !isAtLimit.value) {
-        const html = editor.value.getHTML()
-
-        const isEmpty = html === '<p></p>' || 
-                     html === '<ul></ul>' || 
-                     html === '<ol></ol>' || 
-                     /^<([a-z]+)[^>]*>\s*<\/\1>$/.test(html)
-
-        emit('update:body', isEmpty ? '' : html)
-      }
-      emit('update:modelValue', false)
-    } catch (error) {
-      console.error('Save error:', error)
-    }
+  if (e.key === 'Escape') {
+    cancelEdit();
   }
+};
 
-  const isNearLimit = computed(() => {
-    const charCount = editor.value?.storage.characterCount.characters() || 0
-    return charCount >= CHAR_LIMIT * WARNING_THRESHOLD
-  })
+const cancelEdit = () => {
+  emit('update:modelValue', false);
+  if (props.editType === 'body' && editor.value) {
+    tipTap.setContent(props.bodyValue);
+  }
+};
 
-  const isAtLimit = computed(() => {
-    const charCount = editor.value?.storage.characterCount.characters() || 0
-    return charCount >= CHAR_LIMIT
-  })
-
-  const characterLimitTitle = computed(() => {
-    if (isAtLimit.value) {
-      return 'Character limit reached'
+const saveEdit = () => {
+  if (props.isLoading) return;
+  try {
+    if (props.editType === 'title') {
+      emit('update:title', localTitle.value);
+    } else if (editor.value && !isAtLimit.value) {
+      const html = editor.value.getHTML();
+      const isEmpty = html === '<p></p>' ||
+                      html === '<ul></ul>' ||
+                      html === '<ol></ol>' ||
+                      /^<([a-z]+)[^>]*>\s*<\/\1>$/.test(html);
+      emit('update:body', isEmpty ? '' : html);
     }
-    if (isNearLimit.value) {
-      return 'Approaching character limit'
-    }
-    return ''
-  })
+    emit('update:modelValue', false);
+  } catch (error) {
+    console.error('Save error:', error);
+  }
+};
 
-  onBeforeUnmount(() => {
-    if (editor.value) {
-      editor.value.destroy()
-    }
-  })
-  </script>
+onBeforeUnmount(() => {
+  if (editor.value) {
+    editor.value.destroy();
+  }
+});
+</script>
 
 <style scoped>
   .text-sm {

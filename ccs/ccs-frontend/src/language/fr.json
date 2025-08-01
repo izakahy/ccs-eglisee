@@ -1,0 +1,81 @@
+{
+  "welcome": "Bienvenue",
+  "serviceTimes": "temps de service 10h30",
+  "sundayService": "Service du dimanche",
+  "joinUs": "Joignez-vous à nous dimanche à 10 h 30",
+  "address": "58, RUE FESTIVAL, SHEDIAC, NB E4P IS4",
+  "learnMore": "Apprendre encore plus",
+  "latestSermons": "DERNIERS SERMONS",
+  "ytUrlPlaceholder": "Saisissez l'URL YouTube",
+  "updateVideo": "Mettre à jour la vidéo",
+  "switchLanguage": "Passer à l'anglais",
+  "addEditSection": "Ajouter/Modifier une section",
+  "addEditForm": "Ajouter/Modifier un formulaire",
+  "loading": "Chargement...",
+  "updating": "Mise à jour...",
+  "about": "À propos de nous",
+  "contact": "Contactez",
+  "contactUs": "Contactez-nous",
+  "nextService":"Prochain culte dans",
+  "connectWithUs": "Connectez-vous avec nous",
+  "everySunday": "Chaque dimanche ",
+  "navigation": {
+      "ABOUT": "À PROPOS",
+      "CONNECT": "CONNECTER",
+      "GALLERY": "GALERIE",
+      "GIVE": "DONNER",
+      "NEW": "NOUVEAU",
+      "EVENT": "ÉVÉNEMENT"
+  },
+  "items": {
+      "Our Story": "Notre Histoire",
+      "Mission": "Mission",
+      "Team": "Équipe",
+      "House Fellowship": "Maison de Communion",
+      "Conversation Sundays": "Conversations du Dimanche",
+      "Member": "Membre",
+      "Donate": "Faire un Don",
+      "Update": "Actualiser",
+      "CHURCH": "ÉGLISE"
+    },
+    "invitationCard": {
+      "title": {
+          "aboutPastor": "À PROPOS DU PASTEUR",
+          "houseFellowships": "Bourses de maison",
+          "upcomingEvents": "ÉVÉNEMENTS À VENIR"
+      }
+  },
+  "toolTipMsg": {
+      "close": "Fermer",
+      "frLabel": "Passer au français",
+      "egLabel": "Passer à l'anglais"
+  },
+  "page": {
+    "contentComingSoon": "Le contenu pour {title} sera ajouté bientôt.",
+     "notFound": "Page non trouvée (Erreur 404).",
+     "goHome": "Rentrez chez vous"
+  },
+  "time": {
+        "days": "j",
+        "hours": "h",
+        "minutes": "min",
+        "seconds": "s"
+    },
+  "footer": {
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité"
+  },
+  "inputPlaceholders": {
+    "itemLabel": "Libellé (ex: 'histoire' ou 'mission')",
+    "sectionLabel": "Libellé de section (ex: 'SERVICES')"
+  },
+  "confirmations": {
+    "deleteSection": "Êtes-vous sûr de vouloir supprimer cette section? Cela supprimera tous les éléments qu'elle contient.",
+    "deleteItem": "Êtes-vous sûr de vouloir supprimer cet élément?"
+  },
+  "alerts": {
+    "emptyLabel": "Veuillez saisir un libellé.",
+    "duplicateLabel": "Ce libellé existe déjà. Veuillez choisir un libellé unique.",
+    "emptySectionLabel": "Veuillez saisir un libellé de section"
+  }
+}

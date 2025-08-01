@@ -1,0 +1,81 @@
+{
+    "welcome": "Welcome",
+    "serviceTimes": "service time 10:30 AM",
+    "sundayService": "Sunday Service",
+    "joinUs": "Join Us Sunday at 10:30 AM",
+    "address": "58 FESTIVAL STREET, SHEDIAC, NB E4P IS4",
+    "learnMore": "Learn More",
+    "latestSermons": "LATEST SERMONS",
+    "ytUrlPlaceholder": "Enter YouTube URL",
+    "updateVideo": "Update Video",
+    "switchLanguage": "Switch to French",
+    "addEditSection": "Add/Edit Section",
+    "addEditForm": "Add/Edit Form",
+    "loading": "Loading...",
+    "updating": "Updating...",
+    "about": "About Us",
+    "contact": "Contact",
+    "contactUs": "Contact Us",
+    "nextService":"Next service in",
+    "connectWithUs": "Connect With Us",
+    "everySunday": "Every Sunday",
+    "navigation": {
+        "ABOUT": "ABOUT",
+        "CONNECT": "CONNECT",
+        "GALLERY": "GALLERY",
+        "GIVE": "GIVE",
+        "NEW": "NEW",
+        "EVENT": "EVENT" 
+    },
+    "items": {
+        "Our Story": "Our Story",
+        "Mission": "Mission",
+        "Team": "Team",
+        "House Fellowship": "House Fellowship",
+        "Conversation Sundays": "Conversation Sundays",
+        "Member": "Member",
+        "Donate": "Donate",
+        "Update": "Update",
+        "CHURCH": "CHURCH"
+    },
+    "invitationCard": {
+        "title": {
+            "aboutPastor": "ABOUT PASTOR",
+            "houseFellowships": "HOUSE FELLOWSHIPS",
+            "upcomingEvents": "UPCOMING EVENTS"
+        }
+    },
+    "toolTipMsg": {
+        "close": "Close",
+        "frLabel": "Switch to French",
+        "egLabel": "Switch to English"
+    },
+    "page": {
+        "contentComingSoon": "Content for {title} will be added soon.",
+        "notFound": "Page not found (Error 404).",
+        "goHome": "Go Home"
+    },
+    "time": {
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s"
+    },
+    "footer": {
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy"
+    },
+    "inputPlaceholders": {
+        "itemLabel": "Label (ex: 'story' or 'mission')",
+        "sectionLabel": "Section Label (e.g. 'SERVICES')"
+    },
+    "confirmations": {
+        "deleteSection": "Are you sure you want to delete this section? This will delete all items within it.",
+        "deleteItem": "Are you sure you want to delete this?"
+    },
+    "alerts": {
+        "emptyLabel": "Please enter a label.",
+        "duplicateLabel": "Label already exists. Please choose a unique label.",
+        "emptySectionLabel": "Please enter a section label"
+    }
+}

@@ -1,6 +1,6 @@
-@uri = http://localhost:8000/api
+@uri = http://localhost/api
 @logoutUri = http://localhost:8000/auth/google
-@accessKey = 139|ST96Ut5BExVjVljpPUff5ewjvBipiCMiNgnbvmxS3e710c7c
+@accessKey = 20|tWZdd0DLCzOdIgMyowDtmkEGQmhXbOkaKlHLUHc19cd7aa5c
 
 ### 
 GET {{ uri }}/posts
@@ -101,8 +101,8 @@ Content-Type: application/json
 Accept: application/json
 
 {
-    "title" : "title Test4",
-    "body" : "This is the body test 2"
+    "title" : "title9",
+    "body" : "body9"
 }
 
 
@@ -129,3 +129,73 @@ Accept: application/json
     "title" : "This is the updated title",
     "body" : "This is the updated body"
 }
+
+
+### Test fetching all page contents (index)
+GET {{uri}}/page-contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+
+### Test fetching a specific page content (show)
+GET {{uri}}/page-contents/test-paths
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+
+### Test creating a new page content (store)
+POST {{uri}}/page-contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "path": "/test-paths",
+    "content": {
+        "layout": "single",
+        "contents": {
+            "content1": "This is a test page content"
+        }
+    }
+}
+
+
+### Test updating the page content (update)
+PUT {{uri}}/page-contents/test-path
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "content": {
+        "layout": "gallary",
+        "contents": {
+            "content1": "Updated test content",
+            "galleryItems": [
+                {"image": "data:image/jpeg;base64,...", "caption": "Test image"}
+            ]
+        }
+    }
+}
+
+### Test error case: duplicate path (store)
+POST {{uri}}/page-contents
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "path": "/test-path",
+    "content": {
+        "layout": "single",
+        "contents": {"content1": "Duplicate test"}
+    }
+}
+
+### Test deleting the page content (destroy)
+DELETE {{uri}}/page-contents/test-paths
+Authorization: Bearer {{accessKey}}
+Content-Type: application/json
+Accept: application/json

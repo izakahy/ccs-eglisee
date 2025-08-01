@@ -7,6 +7,7 @@ export const useYTPlayerStore = defineStore('ytPlayer', {
         isLoading: false,
         message: null,
         errors: [],
+        ytData: null,
     }),
 
     actions: {
@@ -20,7 +21,12 @@ export const useYTPlayerStore = defineStore('ytPlayer', {
                     this.ytURL = this.constructEmbedURL(res.data.yTPlayer.yt_url, videoId)
                 }
             } catch (error) {
-                this.errors = error.response?.data || { message: "Failed to fetch url" };
+                
+                if(error.response && error.response.status === 404) {
+                    this.ytData = null;
+                } else {
+                    this.errors = error.response?.data || { message: "Failed to fetch url" };
+                }
             } finally {
                 this.isLoading = false;
             }
@@ -28,13 +34,45 @@ export const useYTPlayerStore = defineStore('ytPlayer', {
         async updateURL(id, url) {
             try {
                 this.isLoading = true;
-                const res = await api.put(`/api/yt-urls/${id}`, {
-                     yt_url: url
-                });
 
+                const videoID = this.extractVideoID(url);
+                if (videoID) {
+                    this.ytURL = this.constructEmbedURL(url, videoID)
+                }
+
+                let res;
+                
+                if (!this.ytData) {
+                    try {
+                        const checkRes = await api.get(`api/yt-urls/${id}`);
+
+                        if (checkRes.data.yTPlayer) {
+                            this.ytData = checkRes.data.yTPlayer;
+                        }
+                    } catch (error) {
+                        if (error.response && error.response.status === 404) {
+                            this.ytData = null;
+                        }
+                    }
+                }
+
+                if(!this.ytData) {
+                    console.log(url)
+                    res = await api.post('/api/yt-urls', {
+                        yt_url: url
+                    })
+                    this.message = "URL Created successfully!";
+                } else {
+                    res = await api.put(`/api/yt-urls/${id}`, {
+                         yt_url: url
+                    });
+                }
+                    
                 if (res.data.yt_url) {
-                    const videoID = this.extractVideoID(res.data.yt_url);
-                    this.ytURL = this.constructEmbedURL(res.data.yt_url, videoID)
+                    const resVideoID = this.extractVideoID(res.data.yt_url);
+                    this.ytURL = this.constructEmbedURL(res.data.yt_url, resVideoID)
+
+                    this.ytData = res.data
                 }
 
                 this.message = "URL updated successfully";

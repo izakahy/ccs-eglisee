@@ -1,6 +1,10 @@
 <template>
   <div 
-    class="md:hidden fixed top-[88px] z-10 right-0 h-[calc(100vh-88px)] w-full bg-black bg-opacity-90 overflow-y-auto transform transition-transform duration-300 ease-in-out"
+    class="lg:hidden fixed z-10 right-0 w-full nav-gradient-mobile overflow-y-auto transform transition-transform duration-300 ease-in-out"
+    :style="{ 
+      top: headerHeight + 'px',
+      height: `calc(100dvh - ${headerHeight}px)`
+    }"
     :class="{ 'translate-x-0': isMenuOpen, 'translate-x-full': !isMenuOpen }"
   >
     <transition :name="transitionDirection">
@@ -26,7 +30,7 @@
             </svg>
           </button>
           <h2 class="text-white text-4xl font-bold w-1/2 text-center">
-            {{ currentView.label }}
+            {{ translateText(`navigation.${currentView.label}`, currentView.label) }}
           </h2>
         </div>
 
@@ -42,9 +46,9 @@
               class="block w-full py-3 text-center text-2xl text-gray-300 hover:text-[clamp(2rem,3vw,4rem)]"
               @click="handleLinkClick"
             >
-              {{ item.label }}
+              {{ translateText(`items.${item.label}`, item.label) }}
             </RouterLink>
-            <hr class="border-gray-700 w-full my-2" />
+            <hr class="border-gray-50 w-full my-2" />
           </li>
         </ul>
       </div>
@@ -58,7 +62,7 @@
         <ul class="flex flex-col items-center justify-center w-full mt-5 space-y-4 pt-4">
           <!-- Dynamic Sections -->
           <template v-for="(section, key, index) in navStore.routes" :key="key">
-            <li class="w-full">
+            <li class="font-bold w-full">
               <div 
                 v-if="section.items.length > 0"
                 class="relative w-1/2 mx-auto cursor-pointer"
@@ -70,12 +74,12 @@
                 @mouseleave="cancelLongPress"
               >
                 <div 
-                class="block w-full py-3 font-bold text-center text-3xl text-white"
+                class="block w-full py-3 text-center text-3xl text-white"
                 :class="{ 
                   'animate-shake' : activeSectionKey === key,
                   'text-[clamp(2rem,3vw,4rem)]' : activeSectionKey === key
                 }">
-                  {{ section.label }}
+                  {{ translateText(`navigation.${section.label}`, section.label) }}
                   
                    <!-- Progress indicator -->
                   <div 
@@ -100,47 +104,27 @@
                 class="block w-1/2 mx-auto py-3 text-center text-3xl text-white hover:text-[clamp(2rem,3vw,4rem)]"
                 @click="handleLinkClick"
               >
-                {{ section.label }}
+                {{ translateText(`navigation.${section.label}`, section.label) }}
               </RouterLink>
             </li>
             <hr class="border-gray-700 w-1/2 mx-auto my-2" />
           </template>
 
-          <!-- Static Sections -->
-          <li class="w-full font-bold">
-            <div class="relative w-1/2 mx-auto">
-              <a
-                href="https://www.youtube.com/@CommunauteCompassionShediac"
-                class="block w-full py-3 text-center text-3xl text-white hover:text-[clamp(2rem,3vw,4rem)]"
-              >
-                WATCH
+          <div class="border-t-2 border-solid w-1/2">
+            <h3 class="text-white text-center font-semibold text-lg mb-4">{{ translateText('connectWithUs', 'Connect With Us')}}</h3>
+            <div class="flex space-x-4 mb-4 justify-center">
+              <a href="https://www.youtube.com/@CommunauteCompassionShediac" 
+                target="_blank"
+                 class="text-gray-400 hover:text-[#FF0000] transition-colors">
+                <i class="fa-brands fa-youtube text-4xl hover:-translate-y-1 transition-all ease-in-out"></i>
+              </a>
+              <a href="https://www.facebook.com/people/Communaut%C3%A9-de-la-Compassion-Shediac/61556619750757/"
+                target="_blank" 
+                 class="text-gray-400 hover:text-[#1877F2] transition-colors">
+                <i class="fa-brands fa-facebook text-4xl hover:-translate-y-1 transition-all ease-in-out"></i>
               </a>
             </div>
-          </li>
-          <hr class="border-gray-700 w-1/2 mx-auto my-2" />
-          <li class="w-full font-bold">
-            <div class="relative w-1/2 mx-auto">
-              <RouterLink 
-                :to="{ name: 'create' }" 
-                class="block w-full py-3 text-center text-white text-3xl hover:text-[clamp(2rem,3vw,4rem)]"
-                @click="handleLinkClick"
-              >
-                FORWARD
-              </RouterLink>
-            </div>
-          </li>
-          <hr class="border-gray-700 w-1/2 mx-auto my-2" />
-          <li class="w-full font-bold">
-            <div class="relative w-1/2 mx-auto">
-              <RouterLink 
-                :to="{ name: 'create' }" 
-                class="block w-full py-3 text-center text-white text-3xl hover:text-[clamp(2rem,3vw,4rem)]"
-                 @click="handleLinkClick"
-              >
-                GIVE
-              </RouterLink>
-            </div>
-          </li>
+          </div>
         </ul>
       </div>
     </transition>
@@ -152,9 +136,12 @@ import { ref, computed, watch } from 'vue'
 import { useNavigationStore } from '@/stores/NavItems/Navigation'
 import { RouterLink } from 'vue-router'
 import router from '@/router'
+import { useLanguage } from '@/composables/useLanguage'
+
 
 const navStore = useNavigationStore()
 const emit = defineEmits(['close-menu'])
+const { translateText } = useLanguage()
 
 const navigationStack = ref([])
 const transitionDirection = ref('slide-left')
@@ -185,12 +172,10 @@ const startLongPress = (section, key, event) => {
   activeSectionKey.value = key
   pressProgress.value = 0
   
-  // animate
   progressInterval.value = setInterval(() => {
     pressProgress.value += (100 / (longPressDuration / 50))  
   }, 50)
 
-  // haptic for android or iphone
   if (navigator.vibrate) {
     navigator.vibrate(200)
   } else if (window.webkit?.messageHandlers) {
@@ -212,7 +197,6 @@ const cancelLongPress = () => {
     longPressTimer.value = null
   }
 
-  // Stop any ongoing vibration
   if (navigator.vibrate) navigator.vibrate(0)
 }
 
@@ -228,6 +212,10 @@ const props = defineProps({
   isMenuOpen: {
     type: Boolean,
     required: true
+  },
+  headerHeight: {
+    type: Number,
+    default: 88
   }
 })
 
@@ -283,5 +271,37 @@ watch(() => props.isMenuOpen, (newVal) => {
   height: 2px;
   background: rgba(255,255,255,0.8);
   transition: width 0.3s ease-out;
+}
+
+.nav-gradient-mobile {
+  opacity: 1;
+  background-color: #021a21;
+  transition: 
+    transform 0.3s ease-in-out,
+    top 0.3s ease-in-out,
+    height 0.3s ease-in-out;
+}
+
+.nav-gradient-mobile::before,
+.nav-gradient-mobile::after {
+  pointer-events: none; /* Allow clicks through the gradient */
+}
+
+
+.nav-gradient-mobile::before {
+  content: '';
+  @apply absolute inset-0 -z-10;
+  background: radial-gradient(800px circle at 50% 40%, rgba(4, 78, 75, 0.9) 0%, rgba(3, 62, 63, 0.8) 25%, rgba(2, 26, 33, 0.6) 50%, rgba(2, 26, 33, 0.4) 75%, rgba(2, 26, 33, 0.2) 100%),
+    linear-gradient(45deg, rgba(3, 62, 63, 0.4) 0%, rgba(4, 78, 75, 0.4) 50%, rgba(2, 26, 33, 0.4) 100%),
+    radial-gradient(600px circle at 70% 50%, rgba(4, 78, 75, 0.5) 0%, transparent 70%),
+    radial-gradient(500px circle at 30% 50%, rgba(3, 62, 63, 0.5) 0%, transparent 70%);
+}
+
+.nav-gradient-mobile::after {
+  content: '';
+  @apply absolute inset-0;
+  background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/%3E%3C/svg%3E');
+  mix-blend-mode: overlay;
+  opacity: 0.15;
 }
 </style>

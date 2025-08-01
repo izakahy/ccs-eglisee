@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\RemovePoweredByHeader;
+use App\Http\Middleware\LogIncomingRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -25,6 +27,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api([
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
         ]);
+
+        $middleware->append(RemovePoweredByHeader::class);
+        $middleware->append( LogIncomingRequests::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

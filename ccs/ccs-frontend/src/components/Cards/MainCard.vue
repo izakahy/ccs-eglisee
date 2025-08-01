@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto bg-gray-200 relative">
       <div class="absolute z-1 inset-0 flex justify-center items-center">
-        <h1 class="hero-text text-shadow">{{ title }}</h1>
+        <h1 class="hero-text text-shadow">{{ $te(`welcome`) ? $t('welcome') : title }}</h1>
       </div>
       <img
         loading="lazy"
@@ -13,6 +13,12 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n';
+import { useLanguage } from '@/composables/useLanguage';
+
+const { t, locale } = useI18n();
+const { currentLocale, toggleLanguage } = useLanguage()
+
   const props = defineProps({
     title: {
         type: String,

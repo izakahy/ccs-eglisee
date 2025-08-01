@@ -22,7 +22,7 @@ export const extensions = [
   }),
   Typography,
   TextAlign.configure({
-    types: ['heading', 'paragraph', 'listItem'], // Add listItem support
+    types: ['heading', 'paragraph', 'listItem'], 
     defaultAlignment: 'left'
   }),
   Underline,
